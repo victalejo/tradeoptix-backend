@@ -7,7 +7,7 @@ import {
   ApiResponse 
 } from '../types';
 
-const API_BASE_URL = 'http://localhost:8080/api/v1';
+const API_BASE_URL = 'https://api.tradeoptix.app/api/v1';
 
 class ApiService {
   private baseURL: string;
