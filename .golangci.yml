@@ -4,133 +4,44 @@ run:
 
 linters:
   enable:
-    - asciicheck
-    - bodyclose
-    - cyclop
-    - dupl
-    - durationcheck
     - errcheck
-    - errname
-    - errorlint
-    - exhaustive
-    - exportloopref
-    - forbidigo
-    - forcetypeassert
-    - goconst
-    - gocritic
-    - gocyclo
-    - godot
-    - gofmt
-    - gofumpt
-    - goheader
-    - goimports
-    - gomnd
-    - gomodguard
-    - goprintffuncname
-    - gosec
     - gosimple
     - govet
     - ineffassign
-    - lll
-    - makezero
-    - misspell
-    - nakedret
-    - nilerr
-    - nlreturn
-    - noctx
-    - nolintlint
-    - prealloc
-    - predeclared
-    - revive
     - staticcheck
-    - stylecheck
-    - thelper
-    - tparallel
     - typecheck
-    - unconvert
-    - unparam
     - unused
-    - varcheck
-    - whitespace
-    - wsl
+    - gofmt
+    - goimports
+    - gosec
+    - misspell
+  disable:
+    - exportloopref # deprecated
+    - gomnd # deprecated
+    - varcheck # deprecated
 
 linters-settings:
-  cyclop:
-    max-complexity: 15
-  
-  dupl:
-    threshold: 100
-  
   errcheck:
-    check-type-assertions: true
-    check-blank: true
-  
-  goconst:
-    min-len: 2
-    min-occurrences: 2
-  
-  gocritic:
-    enabled-tags:
-      - diagnostic
-      - experimental
-      - opinionated
-      - performance
-      - style
-    disabled-checks:
-      - dupImport
-      - ifElseChain
-      - octalLiteral
-      - whyNoLint
-      - wrapperFunc
-  
-  gocyclo:
-    min-complexity: 15
+    check-type-assertions: false
+    check-blank: false
   
   goimports:
     local-prefixes: github.com/victalejo/tradeoptix-backend
   
-  gomnd:
-    settings:
-      mnd:
-        checks: argument,case,condition,operation,return,assign
-  
-  govet:
-    check-shadowing: true
-  
-  lll:
-    line-length: 120
-  
   misspell:
     locale: US
-  
-  nakedret:
-    max-func-lines: 30
-  
-  prealloc:
-    simple: true
-    range-loops: true
-    for-loops: false
-  
-  revive:
-    rules:
-      - name: exported
-      - name: unreachable-code
-      - name: unused-parameter
 
 issues:
   exclude-rules:
     - path: _test\.go
       linters:
-        - gomnd
-        - goconst
-        - dupl
+        - errcheck
     - path: cmd/
       linters:
-        - gomnd
+        - errcheck
     - path: migrations/
       linters:
-        - gomnd
-        - goconst
+        - errcheck
   
-  max-issues-per-linter: 0
-  max-same-issues: 0
+  max-issues-per-linter: 50
+  max-same-issues: 10

@@ -85,13 +85,20 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Run Gosec Security Scanner
-      uses: securecodewarrior/github-action-gosec@master
+    - name: Set up Go
+      uses: actions/setup-go@v4
       with:
-        args: '-fmt sarif -out results.sarif ./...'
+        go-version: '1.21'
+
+    - name: Run Gosec Security Scanner
+      uses: securecodewarrior/github-action-gosec@v2
+      with:
+        args: './...'
+        format: sarif
 
     - name: Upload SARIF file
-      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      uses: github/codeql-action/upload-sarif@v3
       with:
         sarif_file: results.sarif
 
@@ -114,7 +121,7 @@ jobs:
         cache-dependency-path: admin-frontend/package-lock.json
 
     - name: Install dependencies
-      run: npm ci
+      run: npm ci --legacy-peer-deps
 
     - name: Run linter
       run: npm run lint
@@ -144,10 +151,10 @@ jobs:
         cache-dependency-path: tradeoptix-app/package-lock.json
 
     - name: Install dependencies
-      run: npm ci
+      run: npm ci --legacy-peer-deps
 
     - name: Run type check
-      run: npm run tsc --noEmit
+      run: npx tsc --noEmit
 
     - name: Run Expo Doctor
       run: npx expo doctor
