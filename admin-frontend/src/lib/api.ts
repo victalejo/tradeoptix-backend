@@ -124,8 +124,8 @@ export const kycService = {
   },
 
   getAllPendingDocuments: async (): Promise<KYCDocument[]> => {
-    const response: AxiosResponse<KYCDocument[]> = await api.get('/admin/kyc/pending')
-    return response.data
+    const response: AxiosResponse<{ data: KYCDocument[] }> = await api.get('/admin/kyc/pending')
+    return response.data.data || []
   },
 
   approveDocument: async (documentId: string): Promise<void> => {

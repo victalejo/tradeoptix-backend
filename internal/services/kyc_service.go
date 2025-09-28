@@ -46,7 +46,7 @@ func (s *KYCService) UploadDocument(userID uuid.UUID, documentType string, file 
 	// Generar nombre único para el archivo
 	ext := filepath.Ext(file.Filename)
 	filename := fmt.Sprintf("%s_%s_%d%s", userID.String(), documentType, time.Now().Unix(), ext)
-	
+
 	// Crear directorio del usuario si no existe
 	userDir := filepath.Join(s.UploadDir, userID.String())
 	if err := os.MkdirAll(userDir, 0755); err != nil {
@@ -201,7 +201,7 @@ func (s *KYCService) updateUserKYCStatus(docID uuid.UUID) error {
 	}
 
 	// Actualizar estado KYC del usuario
-	_, err = s.DB.Exec("UPDATE users SET kyc_status = $1, updated_at = $2 WHERE id = $3", 
+	_, err = s.DB.Exec("UPDATE users SET kyc_status = $1, updated_at = $2 WHERE id = $3",
 		kycStatus, time.Now(), userID)
 	return err
 }
@@ -224,4 +224,74 @@ func isValidImageType(contentType string) bool {
 		}
 	}
 	return false
+}
+
+func (s *KYCService) GetAllPendingDocuments() ([]models.KYCDocument, error) {
+	query := `
+		SELECT id, user_id, document_type, file_path, original_name, 
+		       file_size, mime_type, status, rejection_reason, 
+		       created_at, updated_at
+		FROM kyc_documents 
+		WHERE status = 'pending'
+		ORDER BY created_at DESC
+	`
+
+	rows, err := s.DB.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var documents []models.KYCDocument
+	for rows.Next() {
+		var doc models.KYCDocument
+
+		err := rows.Scan(
+			&doc.ID, &doc.UserID, &doc.DocumentType, &doc.FilePath, &doc.OriginalName,
+			&doc.FileSize, &doc.MimeType, &doc.Status, &doc.RejectionReason,
+			&doc.CreatedAt, &doc.UpdatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		documents = append(documents, doc)
+	}
+
+	return documents, nil
+}
+
+func (s *KYCService) GetPendingDocuments() ([]models.KYCDocument, error) {
+	var documents []models.KYCDocument
+
+	query := `
+		SELECT d.id, d.user_id, d.document_type, d.file_path, d.original_name,
+		       d.file_size, d.mime_type, d.status, d.rejection_reason,
+		       d.created_at, d.updated_at
+		FROM kyc_documents d
+		WHERE d.status = 'pending'
+		ORDER BY d.created_at ASC
+	`
+
+	rows, err := s.DB.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var doc models.KYCDocument
+		err := rows.Scan(
+			&doc.ID, &doc.UserID, &doc.DocumentType, &doc.FilePath, &doc.OriginalName,
+			&doc.FileSize, &doc.MimeType, &doc.Status, &doc.RejectionReason,
+			&doc.CreatedAt, &doc.UpdatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		documents = append(documents, doc)
+	}
+
+	return documents, nil
 }

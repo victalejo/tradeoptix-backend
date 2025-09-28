@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { User } from '@/types/api'
+import { userService } from '@/lib/api'
 import { 
   MagnifyingGlassIcon,
   EyeIcon,
@@ -22,6 +23,7 @@ import toast from 'react-hot-toast'
 
 export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([])
+  const [filteredUsers, setFilteredUsers] = useState<User[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
@@ -31,76 +33,35 @@ export default function UsersPage() {
     loadUsers()
   }, [])
 
+  useEffect(() => {
+    const filtered = users.filter(user =>
+      user.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.document_number.includes(searchTerm)
+    )
+    setFilteredUsers(filtered)
+  }, [users, searchTerm])
+
   const loadUsers = async () => {
     try {
       setIsLoading(true)
       
-      // Como el backend no tiene implementado el endpoint de admin/users,
-      // simulamos datos para el frontend
-      const mockUsers: User[] = [
-        {
-          id: '1',
-          first_name: 'Juan',
-          last_name: 'Pérez',
-          document_type: 'cedula',
-          document_number: '12345678',
-          email: 'juan@example.com',
-          phone_number: '+573001234567',
-          address: 'Calle 123 #45-67, Bogotá',
-          role: 'user',
-          kyc_status: 'pending',
-          email_verified: true,
-          created_at: '2024-01-15T10:30:00Z',
-          updated_at: '2024-01-15T10:30:00Z'
-        },
-        {
-          id: '2',
-          first_name: 'María',
-          last_name: 'García',
-          document_type: 'cedula',
-          document_number: '87654321',
-          email: 'maria@example.com',
-          phone_number: '+573009876543',
-          address: 'Carrera 45 #67-89, Medellín',
-          role: 'user',
-          kyc_status: 'approved',
-          email_verified: true,
-          created_at: '2024-01-14T14:20:00Z',
-          updated_at: '2024-01-16T09:15:00Z'
-        },
-        {
-          id: '3',
-          first_name: 'Carlos',
-          last_name: 'Rodríguez',
-          document_type: 'pasaporte',
-          document_number: 'AB123456',
-          email: 'carlos@example.com',
-          phone_number: '+573005551234',
-          address: 'Avenida 80 #12-34, Cali',
-          role: 'user',
-          kyc_status: 'rejected',
-          email_verified: false,
-          created_at: '2024-01-13T16:45:00Z',
-          updated_at: '2024-01-17T11:30:00Z'
-        }
-      ]
-
-      setUsers(mockUsers)
+      // Cargar usuarios reales desde la API
+      const response = await userService.getUsers(1, 100)
+      const users = response.data || []
+      
+      setUsers(users)
+      setFilteredUsers(users)
     } catch (error: unknown) {
       console.error('Error loading users:', error)
       toast.error('Error cargando usuarios')
       setUsers([])
+      setFilteredUsers([])
     } finally {
       setIsLoading(false)
     }
   }
-
-  const filteredUsers = users.filter(user =>
-    user.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.document_number.includes(searchTerm)
-  )
 
   const handleViewUser = (user: User) => {
     setSelectedUser(user)

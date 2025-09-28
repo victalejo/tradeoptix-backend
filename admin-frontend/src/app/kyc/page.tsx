@@ -40,59 +40,9 @@ export default function KYCPage() {
     try {
       setIsLoading(true)
       
-      // Simulamos documentos KYC para el frontend
-      const mockDocuments: KYCDocument[] = [
-        {
-          id: '1',
-          user_id: '1',
-          document_type: 'cedula_front',
-          file_path: '/uploads/1/cedula_front.jpg',
-          original_name: 'cedula_frente.jpg',
-          file_size: 2048576,
-          mime_type: 'image/jpeg',
-          status: 'pending',
-          created_at: '2024-01-15T10:30:00Z',
-          updated_at: '2024-01-15T10:30:00Z'
-        },
-        {
-          id: '2',
-          user_id: '1',
-          document_type: 'cedula_back',
-          file_path: '/uploads/1/cedula_back.jpg',
-          original_name: 'cedula_reverso.jpg',
-          file_size: 1987654,
-          mime_type: 'image/jpeg',
-          status: 'pending',
-          created_at: '2024-01-15T10:32:00Z',
-          updated_at: '2024-01-15T10:32:00Z'
-        },
-        {
-          id: '3',
-          user_id: '1',
-          document_type: 'face_photo',
-          file_path: '/uploads/1/face_photo.jpg',
-          original_name: 'foto_facial.jpg',
-          file_size: 1456789,
-          mime_type: 'image/jpeg',
-          status: 'pending',
-          created_at: '2024-01-15T10:35:00Z',
-          updated_at: '2024-01-15T10:35:00Z'
-        },
-        {
-          id: '4',
-          user_id: '2',
-          document_type: 'cedula_front',
-          file_path: '/uploads/2/cedula_front.jpg',
-          original_name: 'documento_frente.jpg',
-          file_size: 2234567,
-          mime_type: 'image/jpeg',
-          status: 'approved',
-          created_at: '2024-01-14T14:20:00Z',
-          updated_at: '2024-01-16T09:15:00Z'
-        }
-      ]
-
-      setDocuments(mockDocuments)
+      // Cargar documentos pendientes desde la API
+      const documentsResponse = await kycService.getAllPendingDocuments()
+      setDocuments(documentsResponse)
     } catch (error: unknown) {
       console.error('Error loading documents:', error)
       toast.error('Error cargando documentos KYC')
