@@ -31,6 +31,7 @@ export default function KYCPage() {
   const [showRejectModal, setShowRejectModal] = useState(false)
   const [rejectReason, setRejectReason] = useState('')
   const [isProcessing, setIsProcessing] = useState(false)
+  const [previewImageUrl, setPreviewImageUrl] = useState<string | null>(null)
 
   useEffect(() => {
     loadDocuments()
@@ -111,9 +112,18 @@ export default function KYCPage() {
     }
   }
 
-  const handleViewDocument = (document: KYCDocument) => {
+  const handleViewDocument = async (document: KYCDocument) => {
     setSelectedDocument(document)
     setShowDocumentModal(true)
+    
+    // Cargar imagen de vista previa
+    try {
+      const imageUrl = await kycService.getDocumentPreviewWithAuth(document.id)
+      setPreviewImageUrl(imageUrl)
+    } catch (error) {
+      console.error('Error loading document preview:', error)
+      setPreviewImageUrl(null)
+    }
   }
 
   const handleDownloadDocument = async (document: KYCDocument) => {
@@ -181,15 +191,25 @@ export default function KYCPage() {
               </span>
             </div>
             
-            {/* Simulación de imagen del documento */}
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-              <DocumentCheckIcon className="mx-auto h-24 w-24 text-gray-400" />
-              <p className="mt-2 text-sm text-gray-600">
-                Vista previa del documento: {selectedDocument.original_name}
-              </p>
-              <p className="text-xs text-gray-500">
-                (En producción se mostraría la imagen real del documento)
-              </p>
+            {/* Vista previa del documento */}
+            <div className="border-2 border-gray-200 rounded-lg overflow-hidden">
+              {previewImageUrl ? (
+                <img 
+                  src={previewImageUrl}
+                  alt={`Documento: ${selectedDocument.original_name}`}
+                  className="w-full h-auto max-h-96 object-contain bg-gray-50"
+                />
+              ) : (
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-50">
+                  <DocumentCheckIcon className="mx-auto h-24 w-24 text-gray-400 animate-pulse" />
+                  <p className="mt-2 text-sm text-gray-600">
+                    Cargando vista previa: {selectedDocument.original_name}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    Por favor espere...
+                  </p>
+                </div>
+              )}
             </div>
             
             {selectedDocument.rejection_reason && (
@@ -204,7 +224,13 @@ export default function KYCPage() {
           <div className="flex justify-end space-x-2">
             <Button
               variant="outline"
-              onClick={() => setShowDocumentModal(false)}
+              onClick={() => {
+                setShowDocumentModal(false)
+                if (previewImageUrl) {
+                  URL.revokeObjectURL(previewImageUrl)
+                  setPreviewImageUrl(null)
+                }
+              }}
             >
               Cerrar
             </Button>

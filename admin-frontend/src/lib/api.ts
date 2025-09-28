@@ -144,9 +144,19 @@ export const kycService = {
   },
 
   getDocumentPreviewUrl: (documentId: string): string => {
-    const token = localStorage.getItem('auth_token')
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'
-    return `${baseUrl}/api/v1/admin/kyc/documents/${documentId}/preview?token=${token}`
+    return `${baseUrl}/api/v1/admin/kyc/documents/${documentId}/preview`
+  },
+
+  getDocumentPreviewWithAuth: async (documentId: string): Promise<string> => {
+    try {
+      const response = await api.get(`/admin/kyc/documents/${documentId}/preview`, {
+        responseType: 'blob'
+      })
+      return URL.createObjectURL(response.data)
+    } catch (error) {
+      throw error
+    }
   }
 }
 
