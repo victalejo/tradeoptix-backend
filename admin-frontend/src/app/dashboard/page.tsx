@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
-import { userService } from '@/lib/api'
+import { userService, dashboardService } from '@/lib/api'
 import { DashboardStats, User } from '@/types/api'
 import { 
   UsersIcon, 
@@ -30,18 +30,9 @@ export default function DashboardPage() {
     try {
       setIsLoading(true)
       
-      // Cargar estadísticas del dashboard
-      // Como no tenemos el endpoint implementado en el backend, simulamos los datos
-      const mockStats: DashboardStats = {
-        total_users: 156,
-        pending_kyc: 23,
-        approved_kyc: 89,
-        rejected_kyc: 8,
-        new_users_today: 5,
-        new_users_this_week: 18,
-        new_users_this_month: 67
-      }
-      setStats(mockStats)
+      // Cargar estadísticas del dashboard usando datos reales
+      const statsResponse = await dashboardService.getStats()
+      setStats(statsResponse)
 
       // Cargar usuarios recientes
       const usersResponse = await userService.getUsers(1, 5)

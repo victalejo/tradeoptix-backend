@@ -62,6 +62,8 @@ func SetupRoutes(router *gin.Engine, db *sql.DB) {
 			admin.Use(middleware.AdminAuth())
 			{
 				admin.GET("/users", adminHandler.GetAllUsers)
+				admin.GET("/users/kyc", adminHandler.GetUsersByKYCStatus)
+				admin.GET("/dashboard/stats", adminHandler.GetDashboardStats)
 				admin.PUT("/kyc/:id/approve", adminHandler.ApproveDocument)
 				admin.PUT("/kyc/:id/reject", adminHandler.RejectDocument)
 			}

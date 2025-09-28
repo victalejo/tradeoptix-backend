@@ -31,8 +31,18 @@ func NewAdminHandler(userService *services.UserService, kycService *services.KYC
 // @Failure 403 {object} map[string]string
 // @Router /admin/users [get]
 func (h *AdminHandler) GetAllUsers(c *gin.Context) {
-	// TODO: Implementar paginación
-	c.JSON(http.StatusOK, gin.H{"message": "Lista de usuarios - Implementar consulta DB"})
+	users, err := h.UserService.GetAllUsers()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error obteniendo usuarios"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data":  users,
+		"total": len(users),
+		"page":  1,
+		"limit": len(users),
+	})
 }
 
 // ApproveDocument godoc
@@ -115,4 +125,46 @@ func (h *AdminHandler) RejectDocument(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Documento rechazado exitosamente"})
+}
+
+// GetDashboardStats godoc
+// @Summary Obtener estadísticas del dashboard (Admin)
+// @Description Obtiene estadísticas generales del sistema
+// @Tags admin
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} map[string]interface{}
+// @Router /admin/dashboard/stats [get]
+func (h *AdminHandler) GetDashboardStats(c *gin.Context) {
+	stats, err := h.UserService.GetDashboardStats()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error obteniendo estadísticas"})
+		return
+	}
+
+	c.JSON(http.StatusOK, stats)
+}
+
+// GetUsersByKYCStatus godoc
+// @Summary Obtener usuarios por estado KYC (Admin)
+// @Description Obtiene usuarios filtrados por estado KYC
+// @Tags admin
+// @Produce json
+// @Security BearerAuth
+// @Param status query string false "Estado KYC (pending, approved, rejected)"
+// @Success 200 {array} models.User
+// @Router /admin/users/kyc [get]
+func (h *AdminHandler) GetUsersByKYCStatus(c *gin.Context) {
+	status := c.Query("status")
+
+	users, err := h.UserService.GetUsersByKYCStatus(status)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error obteniendo usuarios"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data":  users,
+		"total": len(users),
+	})
 }
