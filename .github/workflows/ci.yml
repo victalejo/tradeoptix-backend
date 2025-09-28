@@ -73,7 +73,11 @@ jobs:
         go-version: '1.21'
 
     - name: Run golangci-lint
+<<<<<<< HEAD
       uses: golangci/golangci-lint-action@v6
+=======
+      uses: golangci/golangci-lint-action@v8
+>>>>>>> 7fa68fe5e74b842afc073708b8df7d45867eac82
       with:
         version: v1.59.1
         args: --timeout=5m
