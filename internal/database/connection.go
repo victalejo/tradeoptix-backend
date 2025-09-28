@@ -16,6 +16,10 @@ func Connect(databaseURL string) *sql.DB {
 		log.Fatal("Error conectando a la base de datos:", err)
 	}
 
+	// Configurar timeout para conexiones remotas
+	db.SetMaxIdleConns(10)
+	db.SetMaxOpenConns(100)
+
 	if err := db.Ping(); err != nil {
 		log.Fatal("Error haciendo ping a la base de datos:", err)
 	}

@@ -7,7 +7,7 @@ import {
   ApiResponse 
 } from '../types';
 
-const API_BASE_URL = 'https://api.tradeoptix.app/api/v1';
+const API_BASE_URL = 'http://localhost:8080/api/v1';
 
 class ApiService {
   private baseURL: string;
@@ -33,10 +33,23 @@ class ApiService {
         headers: defaultHeaders,
       });
 
-      const data = await response.json();
+      // Verificar si la respuesta es JSON válido
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const textResponse = await response.text();
+        throw new Error(`Server returned non-JSON response: ${textResponse.substring(0, 100)}...`);
+      }
+
+      let data;
+      try {
+        data = await response.json();
+      } catch (parseError) {
+        const textResponse = await response.text();
+        throw new Error(`JSON Parse error. Server response: ${textResponse.substring(0, 100)}...`);
+      }
 
       if (!response.ok) {
-        throw new Error(data.error || `HTTP error! status: ${response.status}`);
+        throw new Error(data.error || data.message || `HTTP error! status: ${response.status}`);
       }
 
       return data;
