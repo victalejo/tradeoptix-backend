@@ -1,0 +1,36 @@
+# Dependencias
+/vendor/
+
+# Archivos de entorno
+.env
+
+# Archivos subidos
+/uploads/*
+!/uploads/.gitkeep
+
+# Logs
+*.log
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Binarios compilados
+/bin/
+/dist/
+main
+tradeoptix-back
+
+# Archivos temporales
+*.tmp
+*.temp
+
+# Cobertura de tests
+coverage.out
+coverage.html
