@@ -15,10 +15,6 @@ linters:
     - goimports
     - gosec
     - misspell
-  disable:
-    - exportloopref # deprecated
-    - gomnd # deprecated
-    - varcheck # deprecated
 
 linters-settings:
   errcheck:
