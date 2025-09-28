@@ -43,6 +43,24 @@ func (s *KYCService) UploadDocument(userID uuid.UUID, documentType string, file 
 		return nil, fmt.Errorf("archivo demasiado grande. Máximo 5MB")
 	}
 
+	// Verificar si ya existe un documento de este tipo para este usuario
+	var existingDoc models.KYCDocument
+	checkQuery := `SELECT id, file_path FROM kyc_documents WHERE user_id = $1 AND document_type = $2`
+	err := s.DB.QueryRow(checkQuery, userID, documentType).Scan(&existingDoc.ID, &existingDoc.FilePath)
+
+	var shouldReplace bool
+	if err == nil {
+		// El documento existe, lo reemplazaremos
+		shouldReplace = true
+		// Eliminar el archivo anterior si existe
+		if _, err := os.Stat(existingDoc.FilePath); err == nil {
+			os.Remove(existingDoc.FilePath)
+		}
+	} else if err != sql.ErrNoRows {
+		// Error diferente a "no rows found"
+		return nil, fmt.Errorf("error verificando documento existente: %v", err)
+	}
+
 	// Generar nombre único para el archivo
 	ext := filepath.Ext(file.Filename)
 	filename := fmt.Sprintf("%s_%s_%d%s", userID.String(), documentType, time.Now().Unix(), ext)
@@ -74,31 +92,60 @@ func (s *KYCService) UploadDocument(userID uuid.UUID, documentType string, file 
 		return nil, fmt.Errorf("error guardando archivo: %v", err)
 	}
 
-	// Crear registro en base de datos
-	doc := &models.KYCDocument{
-		ID:           uuid.New(),
-		UserID:       userID,
-		DocumentType: documentType,
-		FilePath:     filePath,
-		OriginalName: file.Filename,
-		FileSize:     file.Size,
-		MimeType:     file.Header.Get("Content-Type"),
-		Status:       models.KYCStatusPending,
-		CreatedAt:    time.Now(),
-		UpdatedAt:    time.Now(),
+	// Crear o actualizar registro en base de datos
+	var doc *models.KYCDocument
+
+	if shouldReplace {
+		// Actualizar documento existente
+		doc = &models.KYCDocument{
+			ID:           existingDoc.ID,
+			UserID:       userID,
+			DocumentType: documentType,
+			FilePath:     filePath,
+			OriginalName: file.Filename,
+			FileSize:     file.Size,
+			MimeType:     file.Header.Get("Content-Type"),
+			Status:       models.KYCStatusPending,
+			UpdatedAt:    time.Now(),
+		}
+
+		query := `
+			UPDATE kyc_documents SET
+				file_path = $1, original_name = $2, file_size = $3,
+				mime_type = $4, status = $5, rejection_reason = NULL, updated_at = $6
+			WHERE id = $7
+		`
+
+		_, err = s.DB.Exec(query, doc.FilePath, doc.OriginalName, doc.FileSize,
+			doc.MimeType, doc.Status, doc.UpdatedAt, doc.ID)
+	} else {
+		// Crear nuevo documento
+		doc = &models.KYCDocument{
+			ID:           uuid.New(),
+			UserID:       userID,
+			DocumentType: documentType,
+			FilePath:     filePath,
+			OriginalName: file.Filename,
+			FileSize:     file.Size,
+			MimeType:     file.Header.Get("Content-Type"),
+			Status:       models.KYCStatusPending,
+			CreatedAt:    time.Now(),
+			UpdatedAt:    time.Now(),
+		}
+
+		query := `
+			INSERT INTO kyc_documents (
+				id, user_id, document_type, file_path, original_name,
+				file_size, mime_type, status, created_at, updated_at
+			) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+		`
+
+		_, err = s.DB.Exec(query,
+			doc.ID, doc.UserID, doc.DocumentType, doc.FilePath, doc.OriginalName,
+			doc.FileSize, doc.MimeType, doc.Status, doc.CreatedAt, doc.UpdatedAt,
+		)
 	}
 
-	query := `
-		INSERT INTO kyc_documents (
-			id, user_id, document_type, file_path, original_name,
-			file_size, mime_type, status, created_at, updated_at
-		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-	`
-
-	_, err = s.DB.Exec(query,
-		doc.ID, doc.UserID, doc.DocumentType, doc.FilePath, doc.OriginalName,
-		doc.FileSize, doc.MimeType, doc.Status, doc.CreatedAt, doc.UpdatedAt,
-	)
 	if err != nil {
 		// Eliminar archivo si falla la inserción en DB
 		os.Remove(filePath)

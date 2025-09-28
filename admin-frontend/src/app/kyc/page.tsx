@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
@@ -76,7 +76,7 @@ export default function KYCPage() {
     }
   }
 
-  const handleRejectDocument = async () => {
+  const handleRejectDocument = useCallback(async () => {
     if (!selectedDocument || !rejectReason.trim()) {
       toast.error('Por favor ingrese una razón de rechazo')
       return
@@ -110,7 +110,7 @@ export default function KYCPage() {
     } finally {
       setIsProcessing(false)
     }
-  }
+  }, [selectedDocument, rejectReason])
 
   const handleViewDocument = async (document: KYCDocument) => {
     setSelectedDocument(document)
