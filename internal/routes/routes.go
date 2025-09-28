@@ -17,6 +17,9 @@ func SetupRoutes(router *gin.Engine, db *sql.DB) {
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
 
+	// Servir archivos estáticos de uploads para administradores
+	router.Static("/uploads", "./uploads")
+
 	// Configurar JWT secret (debe venir de config)
 	jwtSecret := "your-super-secret-key-change-in-production"
 
@@ -65,6 +68,7 @@ func SetupRoutes(router *gin.Engine, db *sql.DB) {
 				admin.GET("/users/kyc", adminHandler.GetUsersByKYCStatus)
 				admin.GET("/dashboard/stats", adminHandler.GetDashboardStats)
 				admin.GET("/kyc/pending", adminHandler.GetPendingDocuments)
+				admin.GET("/kyc/documents/:id/preview", adminHandler.ServeDocument)
 				admin.PUT("/kyc/:id/approve", adminHandler.ApproveDocument)
 				admin.PUT("/kyc/:id/reject", adminHandler.RejectDocument)
 			}

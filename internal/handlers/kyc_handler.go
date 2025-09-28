@@ -139,3 +139,41 @@ func (h *KYCHandler) ServeDocument(c *gin.Context) {
 	c.Header("Content-Type", targetDoc.MimeType)
 	c.File(targetDoc.FilePath)
 }
+
+// ServeDocumentAdmin godoc
+// @Summary Servir documento para admin (vista previa)
+// @Description Sirve un documento KYC para vista previa por parte de administradores
+// @Tags admin
+// @Produce application/octet-stream
+// @Security BearerAuth
+// @Param id path string true "ID del documento"
+// @Success 200 {file} binary
+// @Failure 401 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Router /admin/kyc/documents/{id}/preview [get]
+func (h *KYCHandler) ServeDocumentAdmin(c *gin.Context) {
+	docIDStr := c.Param("id")
+	if docIDStr == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID de documento requerido"})
+		return
+	}
+
+	docID, err := uuid.Parse(docIDStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID de documento inválido"})
+		return
+	}
+
+	// Obtener documento por ID (sin restricción de usuario para admin)
+	document, err := h.KYCService.GetDocumentByID(docID)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Documento no encontrado"})
+		return
+	}
+
+	// Verificar que el archivo existe
+	// Servir el archivo para vista previa (inline, no como descarga)
+	c.Header("Content-Type", document.MimeType)
+	c.Header("Cache-Control", "max-age=3600") // Cache por 1 hora
+	c.File(document.FilePath)
+}

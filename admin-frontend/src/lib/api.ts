@@ -137,10 +137,16 @@ export const kycService = {
   },
 
   downloadDocument: async (documentId: string): Promise<Blob> => {
-    const response: AxiosResponse<Blob> = await api.get(`/admin/kyc/${documentId}/download`, {
+    const response: AxiosResponse<Blob> = await api.get(`/admin/kyc/documents/${documentId}/preview`, {
       responseType: 'blob'
     })
     return response.data
+  },
+
+  getDocumentPreviewUrl: (documentId: string): string => {
+    const token = localStorage.getItem('auth_token')
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'
+    return `${baseUrl}/api/v1/admin/kyc/documents/${documentId}/preview?token=${token}`
   }
 }
 

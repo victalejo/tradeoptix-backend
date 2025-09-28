@@ -5,7 +5,10 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
+    "build:dev": "NODE_ENV=development next build --turbopack",
+    "build:prod": "NODE_ENV=production next build --turbopack",
     "start": "next start",
+    "start:prod": "NODE_ENV=production next start",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
     "type-check": "tsc --noEmit"

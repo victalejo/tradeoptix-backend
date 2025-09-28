@@ -57,12 +57,27 @@ export default function SettingsPage() {
             <div className="p-6">
               <div className="space-y-4">
                 <div>
+                  <label className="text-sm font-medium text-gray-700">Entorno</label>
+                  <div className="flex items-center space-x-2">
+                    <p className="text-sm text-gray-900">
+                      {apiUrl?.includes('localhost') ? 'Desarrollo' : 'Producción'}
+                    </p>
+                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                      apiUrl?.includes('localhost') 
+                        ? 'bg-yellow-100 text-yellow-800' 
+                        : 'bg-green-100 text-green-800'
+                    }`}>
+                      {apiUrl?.includes('localhost') ? 'DEV' : 'PROD'}
+                    </span>
+                  </div>
+                </div>
+                <div>
                   <label className="text-sm font-medium text-gray-700">Versión del Backend</label>
                   <p className="text-sm text-gray-900">v1.0.0</p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-700">API URL</label>
-                  <p className="text-sm text-gray-900 font-mono bg-gray-50 px-2 py-1 rounded">{apiUrl}</p>
+                  <p className="text-sm text-gray-900 font-mono bg-gray-50 px-2 py-1 rounded break-all">{apiUrl}</p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-700">Estado del Backend</label>
