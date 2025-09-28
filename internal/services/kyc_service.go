@@ -263,7 +263,7 @@ func (s *KYCService) GetAllPendingDocuments() ([]models.KYCDocument, error) {
 
 func (s *KYCService) GetDocumentByID(docID uuid.UUID) (*models.KYCDocument, error) {
 	var doc models.KYCDocument
-	
+
 	query := `
 		SELECT d.id, d.user_id, d.document_type, d.file_path, d.original_name,
 		       d.file_size, d.mime_type, d.status, d.rejection_reason,
