@@ -17,6 +17,14 @@ import { useAuth } from '../context/AuthContext';
 import { Button } from '../components/Button';
 import { KYCDocument } from '../types';
 import ApiService from '../services/api';
+import { 
+  ensureArray, 
+  safeArrayLength, 
+  safeArrayFind, 
+  safeArrayMap, 
+  safeArrayEvery, 
+  safeArraySome 
+} from '../utils';
 
 const documentTypes = [
   {
@@ -75,10 +83,12 @@ export const KYCScreen: React.FC = () => {
     try {
       setIsLoading(true);
       const docs = await ApiService.getKYCDocuments(token);
-      setDocuments(docs);
+      // Asegurar que docs sea siempre un array
+      setDocuments(Array.isArray(docs) ? docs : []);
     } catch (error) {
       console.error('Error loading documents:', error);
       Alert.alert('Error', 'No se pudieron cargar los documentos');
+      setDocuments([]); // Establecer array vacío en caso de error
     } finally {
       setIsLoading(false);
     }
@@ -91,7 +101,7 @@ export const KYCScreen: React.FC = () => {
   };
 
   const getDocumentStatus = (type: string) => {
-    const doc = documents.find(d => d.document_type === type);
+    const doc = safeArrayFind(documents, d => d.document_type === type);
     return doc ? doc.status : null;
   };
 
@@ -155,7 +165,7 @@ export const KYCScreen: React.FC = () => {
         quality: 0.8,
       });
 
-      if (!result.canceled && result.assets[0]) {
+      if (!result.canceled && result.assets && Array.isArray(result.assets) && result.assets.length > 0) {
         await uploadDocument(documentType, result.assets[0].uri);
       }
     } catch (error) {
@@ -173,7 +183,7 @@ export const KYCScreen: React.FC = () => {
         quality: 0.8,
       });
 
-      if (!result.canceled && result.assets[0]) {
+      if (!result.canceled && result.assets && Array.isArray(result.assets) && result.assets.length > 0) {
         await uploadDocument(documentType, result.assets[0].uri);
       }
     } catch (error) {
@@ -208,9 +218,11 @@ export const KYCScreen: React.FC = () => {
   };
 
   const checkKYCCompletion = () => {
+    if (safeArrayLength(documents) === 0) return;
+    
     const requiredDocs: ('cedula_front' | 'cedula_back' | 'face_photo')[] = ['cedula_front', 'cedula_back', 'face_photo'];
-    const uploadedDocs = documents.map(d => d.document_type);
-    const allUploaded = requiredDocs.every(type => uploadedDocs.includes(type));
+    const uploadedDocs = safeArrayMap(documents, d => d.document_type);
+    const allUploaded = safeArrayEvery(requiredDocs, type => uploadedDocs.includes(type));
 
     if (allUploaded && user) {
       Alert.alert(
@@ -222,16 +234,16 @@ export const KYCScreen: React.FC = () => {
   };
 
   const getOverallKYCStatus = () => {
-    if (!documents.length) return 'incomplete';
+    if (safeArrayLength(documents) === 0) return 'incomplete';
     
     const requiredDocs: ('cedula_front' | 'cedula_back' | 'face_photo')[] = ['cedula_front', 'cedula_back', 'face_photo'];
-    const uploadedDocs = documents.map(d => d.document_type);
-    const allUploaded = requiredDocs.every(type => uploadedDocs.includes(type));
+    const uploadedDocs = safeArrayMap(documents, d => d.document_type);
+    const allUploaded = safeArrayEvery(requiredDocs, type => uploadedDocs.includes(type));
 
     if (!allUploaded) return 'incomplete';
     
-    const hasRejected = documents.some(d => d.status === 'rejected');
-    const allApproved = documents.every(d => d.status === 'approved');
+    const hasRejected = safeArraySome(documents, d => d.status === 'rejected');
+    const allApproved = safeArrayEvery(documents, d => d.status === 'approved');
     
     if (hasRejected) return 'rejected';
     if (allApproved) return 'approved';
@@ -316,7 +328,8 @@ export const KYCScreen: React.FC = () => {
           {documentTypes.map((docType) => {
             const status = getDocumentStatus(docType.type);
             const isUploading = uploadingType === docType.type;
-            const rejectedDoc = documents.find(
+            const rejectedDoc = safeArrayFind(
+              documents,
               d => d.document_type === docType.type && d.status === 'rejected'
             );
 

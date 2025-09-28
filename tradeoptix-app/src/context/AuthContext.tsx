@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState, ReactNode } from
 import * as SecureStore from 'expo-secure-store';
 import { User, AuthContextType, RegisterRequest } from '../types';
 import ApiService from '../services/api';
+import { safeJsonParse } from '../utils';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -28,14 +29,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       if (storedToken && storedUser) {
         setToken(storedToken);
-        setUser(JSON.parse(storedUser));
+        const parsedUser = safeJsonParse<User | null>(storedUser, null);
         
-        // Verificar que el token siga siendo válido
-        try {
-          const userProfile = await ApiService.getProfile(storedToken);
-          setUser(userProfile);
-        } catch (error) {
-          // Token inválido, limpiar datos
+        if (parsedUser) {
+          setUser(parsedUser);
+          
+          // Verificar que el token siga siendo válido
+          try {
+            const userProfile = await ApiService.getProfile(storedToken);
+            setUser(userProfile);
+          } catch (error) {
+            // Token inválido, limpiar datos
+            await clearAuthData();
+          }
+        } else {
+          // Datos de usuario corruptos, limpiar
           await clearAuthData();
         }
       }
@@ -108,7 +116,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const updateUser = (updatedUser: User) => {
     setUser(updatedUser);
     if (updatedUser) {
-      SecureStore.setItemAsync('user_data', JSON.stringify(updatedUser));
+      try {
+        SecureStore.setItemAsync('user_data', JSON.stringify(updatedUser));
+      } catch (error) {
+        console.error('Error updating user data:', error);
+      }
     }
   };
 

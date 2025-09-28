@@ -48,6 +48,11 @@ class ApiService {
         throw new Error(`JSON Parse error. Server response: ${textResponse.substring(0, 100)}...`);
       }
 
+      // Manejar respuestas null o undefined
+      if (data === null || data === undefined) {
+        data = {};
+      }
+
       if (!response.ok) {
         throw new Error(data.error || data.message || `HTTP error! status: ${response.status}`);
       }
@@ -134,7 +139,14 @@ class ApiService {
     const response = await this.authenticatedRequest<KYCDocument[]>('/kyc/documents', token, {
       method: 'GET',
     });
-    return response as KYCDocument[];
+    // Asegurar que siempre devolvamos un array
+    const data = response as any;
+    if (data && Array.isArray(data)) {
+      return data;
+    } else if (data && data.data && Array.isArray(data.data)) {
+      return data.data;
+    }
+    return [];
   }
 
   async downloadKYCDocument(token: string, documentId: string): Promise<Blob> {
