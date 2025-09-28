@@ -1,0 +1,113 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.21'
+
+    - name: Get tag name
+      id: tag
+      run: echo "TAG_NAME=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
+
+    - name: Generate changelog
+      id: changelog
+      run: |
+        # Obtener el tag anterior
+        PREVIOUS_TAG=$(git tag --sort=-version:refname | grep -v ${{ steps.tag.outputs.TAG_NAME }} | head -n 1)
+        
+        # Si no hay tag anterior, usar el primer commit
+        if [ -z "$PREVIOUS_TAG" ]; then
+          PREVIOUS_TAG=$(git rev-list --max-parents=0 HEAD)
+        fi
+        
+        # Generar changelog
+        CHANGELOG=$(git log $PREVIOUS_TAG..${{ steps.tag.outputs.TAG_NAME }} --pretty=format:"- %s (%h)" --no-merges)
+        
+        # Guardar changelog
+        echo "CHANGELOG<<EOF" >> $GITHUB_OUTPUT
+        echo "$CHANGELOG" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+
+    - name: Build binaries
+      run: |
+        # Crear directorio de builds
+        mkdir -p builds
+        
+        # Build para diferentes plataformas
+        GOOS=linux GOARCH=amd64 go build -ldflags="-w -s -X main.Version=${{ steps.tag.outputs.TAG_NAME }}" -o builds/tradeoptix-server-linux-amd64 cmd/server/main.go
+        GOOS=linux GOARCH=arm64 go build -ldflags="-w -s -X main.Version=${{ steps.tag.outputs.TAG_NAME }}" -o builds/tradeoptix-server-linux-arm64 cmd/server/main.go
+        GOOS=darwin GOARCH=amd64 go build -ldflags="-w -s -X main.Version=${{ steps.tag.outputs.TAG_NAME }}" -o builds/tradeoptix-server-darwin-amd64 cmd/server/main.go
+        GOOS=darwin GOARCH=arm64 go build -ldflags="-w -s -X main.Version=${{ steps.tag.outputs.TAG_NAME }}" -o builds/tradeoptix-server-darwin-arm64 cmd/server/main.go
+        GOOS=windows GOARCH=amd64 go build -ldflags="-w -s -X main.Version=${{ steps.tag.outputs.TAG_NAME }}" -o builds/tradeoptix-server-windows-amd64.exe cmd/server/main.go
+
+    - name: Create checksums
+      run: |
+        cd builds
+        sha256sum * > checksums.txt
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ steps.tag.outputs.TAG_NAME }}
+        name: Release ${{ steps.tag.outputs.TAG_NAME }}
+        body: |
+          ## 🚀 TradeOptix Backend Release ${{ steps.tag.outputs.TAG_NAME }}
+          
+          ### 📋 Changelog
+          ${{ steps.changelog.outputs.CHANGELOG }}
+          
+          ### 📥 Downloads
+          
+          | Platform | Architecture | Download |
+          |----------|-------------|----------|
+          | Linux | amd64 | [tradeoptix-server-linux-amd64](https://github.com/victalejo/tradeoptix-backend/releases/download/${{ steps.tag.outputs.TAG_NAME }}/tradeoptix-server-linux-amd64) |
+          | Linux | arm64 | [tradeoptix-server-linux-arm64](https://github.com/victalejo/tradeoptix-backend/releases/download/${{ steps.tag.outputs.TAG_NAME }}/tradeoptix-server-linux-arm64) |
+          | macOS | amd64 | [tradeoptix-server-darwin-amd64](https://github.com/victalejo/tradeoptix-backend/releases/download/${{ steps.tag.outputs.TAG_NAME }}/tradeoptix-server-darwin-amd64) |
+          | macOS | arm64 (Apple Silicon) | [tradeoptix-server-darwin-arm64](https://github.com/victalejo/tradeoptix-backend/releases/download/${{ steps.tag.outputs.TAG_NAME }}/tradeoptix-server-darwin-arm64) |
+          | Windows | amd64 | [tradeoptix-server-windows-amd64.exe](https://github.com/victalejo/tradeoptix-backend/releases/download/${{ steps.tag.outputs.TAG_NAME }}/tradeoptix-server-windows-amd64.exe) |
+          
+          ### 🔐 Verification
+          
+          To verify the integrity of the downloaded files, use the provided checksums:
+          ```bash
+          sha256sum -c checksums.txt
+          ```
+          
+          ### 🛠️ Installation
+          
+          1. Download the appropriate binary for your platform
+          2. Make it executable (Linux/macOS): `chmod +x tradeoptix-server-*`
+          3. Run the server: `./tradeoptix-server-*` or `tradeoptix-server-windows-amd64.exe`
+          
+          ### 📚 Documentation
+          
+          - [Installation Guide](https://github.com/victalejo/tradeoptix-backend/blob/main/docs/INSTALLATION.md)
+          - [API Documentation](https://github.com/victalejo/tradeoptix-backend#-documentación-de-la-api)
+          
+          ### 🆕 What's Changed
+          
+          Full Changelog: https://github.com/victalejo/tradeoptix-backend/compare/$PREVIOUS_TAG...${{ steps.tag.outputs.TAG_NAME }}
+          
+        files: |
+          builds/*
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

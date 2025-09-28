@@ -1,12 +1,23 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"os"
 	"tradeoptix-back/internal/config"
 	"tradeoptix-back/internal/database"
 	"tradeoptix-back/internal/routes"
 
 	"github.com/gin-gonic/gin"
+)
+
+var (
+	// Version se establece en tiempo de compilación
+	Version = "dev"
+	// BuildDate se establece en tiempo de compilación
+	BuildDate = "unknown"
+	// GitCommit se establece en tiempo de compilación
+	GitCommit = "unknown"
 )
 
 // @title TradeOptix API
@@ -29,6 +40,15 @@ import (
 // @description Ingrese 'Bearer ' seguido del token JWT
 
 func main() {
+	// Verificar si se solicita información de versión
+	if len(os.Args) > 1 && (os.Args[1] == "--version" || os.Args[1] == "-v") {
+		fmt.Printf("TradeOptix Backend\n")
+		fmt.Printf("Version: %s\n", Version)
+		fmt.Printf("Build Date: %s\n", BuildDate)
+		fmt.Printf("Git Commit: %s\n", GitCommit)
+		return
+	}
+
 	// Cargar configuración
 	cfg := config.Load()
 
@@ -51,7 +71,8 @@ func main() {
 	// Configurar rutas
 	routes.SetupRoutes(router, db)
 
-	// Iniciar servidor
+	// Mostrar información de versión al iniciar
+	log.Printf("TradeOptix Backend %s (Build: %s, Commit: %s)", Version, BuildDate, GitCommit)
 	log.Printf("Servidor iniciado en puerto %s", cfg.Port)
 	if err := router.Run(":" + cfg.Port); err != nil {
 		log.Fatal("Error iniciando servidor:", err)

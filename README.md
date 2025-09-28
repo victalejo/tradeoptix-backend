@@ -1,5 +1,14 @@
 # TradeOptix
 
+[![Go Version](https://img.shields.io/badge/Go-1.21+-00ADD8?style=for-the-badge&logo=go)](https://golang.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-12+-316192?style=for-the-badge&logo=postgresql)](https://www.postgresql.org/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+[![GitHub Release](https://img.shields.io/github/v/release/victalejo/tradeoptix-backend?style=for-the-badge)](https://github.com/victalejo/tradeoptix-backend/releases)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/victalejo/tradeoptix-backend/ci.yml?branch=main&style=for-the-badge)](https://github.com/victalejo/tradeoptix-backend/actions)
+[![Go Report Card](https://goreportcard.com/badge/github.com/victalejo/tradeoptix-backend?style=for-the-badge)](https://goreportcard.com/report/github.com/victalejo/tradeoptix-backend)
+[![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=nextdotjs)](https://nextjs.org/)
+[![React Native](https://img.shields.io/badge/React_Native-Expo-61DAFB?style=for-the-badge&logo=react)](https://reactnative.dev/)
+
 Plataforma completa de inversión con backend en Go, frontend administrativo en Next.js 15 y aplicación móvil en React Native.
 
 ## 📱 Componentes del Sistema

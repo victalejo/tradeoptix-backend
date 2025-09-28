@@ -106,6 +106,49 @@ health-check: ## Verificar que el servidor esté funcionando
 	@echo "$(GREEN)Verificando estado del servidor...$(NC)"
 	@curl -f http://localhost:8080/health || echo "$(RED)❌ Servidor no disponible$(NC)"
 
+# Release commands
+VERSION ?= $(shell git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+NEXT_VERSION ?= $(shell echo $(VERSION) | awk -F. '{$$NF = $$NF + 1;} 1' | sed 's/ /./g')
+
+release-patch: ## Create a patch release
+	@echo "$(GREEN)Creando release patch...$(NC)"
+	@$(MAKE) pre-release
+	git tag -a v$(NEXT_VERSION) -m "Release v$(NEXT_VERSION)"
+	git push origin v$(NEXT_VERSION)
+	@echo "$(GREEN)✓ Release v$(NEXT_VERSION) creado$(NC)"
+
+release-minor: ## Create a minor release
+	@echo "$(GREEN)Creando release minor...$(NC)"
+	@$(MAKE) pre-release
+	$(eval MINOR_VERSION := $(shell echo $(VERSION) | awk -F. '{$$2 = $$2 + 1; $$3 = 0;} 1' | sed 's/ /./g'))
+	git tag -a v$(MINOR_VERSION) -m "Release v$(MINOR_VERSION)"
+	git push origin v$(MINOR_VERSION)
+	@echo "$(GREEN)✓ Release v$(MINOR_VERSION) creado$(NC)"
+
+release-major: ## Create a major release
+	@echo "$(GREEN)Creando release major...$(NC)"
+	@$(MAKE) pre-release
+	$(eval MAJOR_VERSION := $(shell echo $(VERSION) | awk -F. '{$$1 = $$1 + 1; $$2 = 0; $$3 = 0;} 1' | sed 's/ /./g'))
+	git tag -a v$(MAJOR_VERSION) -m "Release v$(MAJOR_VERSION)"
+	git push origin v$(MAJOR_VERSION)
+	@echo "$(GREEN)✓ Release v$(MAJOR_VERSION) creado$(NC)"
+
+pre-release: ## Preparar release (tests, lint, etc.)
+	@echo "$(GREEN)Preparando release...$(NC)"
+	@$(MAKE) fmt
+	@$(MAKE) lint
+	@$(MAKE) test
+	@$(MAKE) build
+	@echo "$(GREEN)✓ Pre-release checks completados$(NC)"
+
+version: ## Mostrar versión actual
+	@echo "Versión actual: $(VERSION)"
+
+changelog: ## Generar changelog automático
+	@echo "$(GREEN)Generando changelog...$(NC)"
+	@git log $(VERSION)..HEAD --pretty=format:"- %s (%h)" --no-merges > CHANGELOG_TEMP.md
+	@echo "$(GREEN)✓ Changelog generado en CHANGELOG_TEMP.md$(NC)"
+
 all: fmt lint test build ## Ejecutar todos los checks y compilar
 
 # Crear directorio de uploads si no existe

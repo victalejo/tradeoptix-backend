@@ -1,0 +1,79 @@
+version: 2
+updates:
+  # Enable version updates for Go modules
+  - package-ecosystem: "gomod"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "victalejo"
+    assignees:
+      - "victalejo"
+    labels:
+      - "dependencies"
+      - "go"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+
+  # Enable version updates for npm (Admin Frontend)
+  - package-ecosystem: "npm"
+    directory: "/admin-frontend"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "victalejo"
+    assignees:
+      - "victalejo"
+    labels:
+      - "dependencies"
+      - "frontend"
+      - "javascript"
+    commit-message:
+      prefix: "deps(frontend)"
+      include: "scope"
+
+  # Enable version updates for npm (Mobile App)
+  - package-ecosystem: "npm"
+    directory: "/tradeoptix-app"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "victalejo"
+    assignees:
+      - "victalejo"
+    labels:
+      - "dependencies"
+      - "mobile"
+      - "react-native"
+    commit-message:
+      prefix: "deps(mobile)"
+      include: "scope"
+
+  # Enable version updates for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 3
+    reviewers:
+      - "victalejo"
+    assignees:
+      - "victalejo"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "deps(actions)"
+      include: "scope"
