@@ -47,12 +47,13 @@ export default function LoginPage() {
       
       toast.success(`¡Bienvenido, ${response.user.first_name}!`)
       router.push('/dashboard')
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Login error:', error)
-      toast.error(
-        error.response?.data?.error || 
-        'Error al iniciar sesión. Verifique sus credenciales.'
-      )
+      const errorMessage = error && typeof error === 'object' && 'response' in error && 
+        error.response && typeof error.response === 'object' && 'data' in error.response &&
+        error.response.data && typeof error.response.data === 'object' && 'error' in error.response.data ?
+        String(error.response.data.error) : 'Error al iniciar sesión. Verifique sus credenciales.'
+      toast.error(errorMessage)
     } finally {
       setIsLoading(false)
     }

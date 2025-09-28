@@ -5,8 +5,7 @@ import {
   LoginResponse, 
   KYCDocument, 
   DashboardStats, 
-  PaginatedResponse, 
-  ApiResponse 
+  PaginatedResponse 
 } from '@/types/api'
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'
@@ -152,8 +151,8 @@ export const dashboardService = {
     return response.data
   },
 
-  getRecentActivity: async (): Promise<any[]> => {
-    const response: AxiosResponse<any[]> = await api.get('/admin/dashboard/activity')
+  getRecentActivity: async (): Promise<Array<Record<string, unknown>>> => {
+    const response: AxiosResponse<Array<Record<string, unknown>>> = await api.get('/admin/dashboard/activity')
     return response.data
   }
 }

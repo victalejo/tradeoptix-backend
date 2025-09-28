@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
-import { dashboardService, userService } from '@/lib/api'
+import { userService } from '@/lib/api'
 import { DashboardStats, User } from '@/types/api'
 import { 
   UsersIcon, 
@@ -13,8 +13,9 @@ import {
   CheckCircleIcon,
   XCircleIcon 
 } from '@heroicons/react/24/outline'
-import { formatRelativeDate, getKYCStatusColor, getKYCStatusText } from '@/lib/utils'
+import { formatRelativeDate, getKYCStatusText } from '@/lib/utils'
 import toast from 'react-hot-toast'
+import { ComponentType } from 'react'
 
 export default function DashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null)
@@ -45,7 +46,7 @@ export default function DashboardPage() {
       // Cargar usuarios recientes
       const usersResponse = await userService.getUsers(1, 5)
       setRecentUsers(usersResponse.data || [])
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error loading dashboard data:', error)
       toast.error('Error cargando datos del dashboard')
       
@@ -73,7 +74,7 @@ export default function DashboardPage() {
   }: {
     title: string
     value: number
-    icon: any
+    icon: ComponentType<{ className?: string }>
     color?: string
     subtitle?: string
   }) => (

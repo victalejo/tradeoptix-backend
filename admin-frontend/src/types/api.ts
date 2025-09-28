@@ -45,7 +45,7 @@ export interface LoginResponse {
   expires_at: string;
 }
 
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = Record<string, unknown>> {
   success?: boolean;
   message?: string;
   data?: T;

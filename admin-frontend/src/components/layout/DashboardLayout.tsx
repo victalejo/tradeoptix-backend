@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { Sidebar } from './Sidebar'
 import { Header } from './Header'
@@ -16,6 +16,12 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
+
+  const handleLogout = useCallback(() => {
+    authService.logout()
+    toast.success('Sesión cerrada exitosamente')
+    router.push('/login')
+  }, [router])
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -51,13 +57,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     }
 
     checkAuth()
-  }, [router])
-
-  const handleLogout = () => {
-    authService.logout()
-    toast.success('Sesión cerrada exitosamente')
-    router.push('/login')
-  }
+  }, [router, handleLogout])
 
   if (isLoading) {
     return (

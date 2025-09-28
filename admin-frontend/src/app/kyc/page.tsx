@@ -19,8 +19,7 @@ import {
   formatDate, 
   formatFileSize, 
   getKYCDocumentTypeText,
-  getKYCStatusText,
-  getKYCStatusColor
+  getKYCStatusText
 } from '@/lib/utils'
 import toast from 'react-hot-toast'
 
@@ -94,7 +93,7 @@ export default function KYCPage() {
       ]
 
       setDocuments(mockDocuments)
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error loading documents:', error)
       toast.error('Error cargando documentos KYC')
       setDocuments([])
@@ -118,7 +117,7 @@ export default function KYCPage() {
       )
       
       toast.success('Documento aprobado exitosamente')
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error approving document:', error)
       toast.error('Error al aprobar documento')
     } finally {
@@ -154,7 +153,7 @@ export default function KYCPage() {
       setRejectReason('')
       setSelectedDocument(null)
       toast.success('Documento rechazado')
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error rejecting document:', error)
       toast.error('Error al rechazar documento')
     } finally {
@@ -171,7 +170,7 @@ export default function KYCPage() {
     try {
       // Simular descarga
       toast.success(`Descargando ${document.original_name}`)
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error downloading document:', error)
       toast.error('Error al descargar documento')
     }

@@ -5,8 +5,7 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
-import { userService } from '@/lib/api'
-import { User, PaginatedResponse } from '@/types/api'
+import { User } from '@/types/api'
 import { 
   MagnifyingGlassIcon,
   EyeIcon,
@@ -25,14 +24,12 @@ export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
-  const [currentPage, setCurrentPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(1)
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [showUserModal, setShowUserModal] = useState(false)
 
   useEffect(() => {
     loadUsers()
-  }, [currentPage])
+  }, [])
 
   const loadUsers = async () => {
     try {
@@ -89,8 +86,7 @@ export default function UsersPage() {
       ]
 
       setUsers(mockUsers)
-      setTotalPages(1)
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error loading users:', error)
       toast.error('Error cargando usuarios')
       setUsers([])
