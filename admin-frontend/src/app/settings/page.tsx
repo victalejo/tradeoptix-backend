@@ -1,9 +1,42 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { Card } from '@/components/ui/Card'
+import { Button } from '@/components/ui/Button'
+import { healthService } from '@/lib/api'
+import toast from 'react-hot-toast'
 
 export default function SettingsPage() {
+  const [backendStatus, setBackendStatus] = useState<'connected' | 'disconnected' | 'checking'>('checking')
+  const [apiUrl, setApiUrl] = useState<string>('')
+
+  useEffect(() => {
+    checkBackendStatus()
+    setApiUrl(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080')
+  }, [])
+
+  const checkBackendStatus = async () => {
+    try {
+      setBackendStatus('checking')
+      await healthService.check()
+      setBackendStatus('connected')
+    } catch (error) {
+      console.error('Backend health check failed:', error)
+      setBackendStatus('disconnected')
+    }
+  }
+
+  const handleRefreshStatus = () => {
+    toast.promise(
+      checkBackendStatus(),
+      {
+        loading: 'Verificando conexión...',
+        success: 'Conexión verificada correctamente',
+        error: 'Error al verificar la conexión'
+      }
+    )
+  }
   return (
     <DashboardLayout>
       <div className="space-y-6">
@@ -29,13 +62,31 @@ export default function SettingsPage() {
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-700">API URL</label>
-                  <p className="text-sm text-gray-900">http://localhost:8080</p>
+                  <p className="text-sm text-gray-900 font-mono bg-gray-50 px-2 py-1 rounded">{apiUrl}</p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-700">Estado del Backend</label>
-                  <div className="flex items-center mt-1">
-                    <div className="h-2 w-2 bg-green-400 rounded-full mr-2"></div>
-                    <span className="text-sm text-gray-900">Conectado</span>
+                  <div className="flex items-center justify-between mt-1">
+                    <div className="flex items-center">
+                      <div className={`h-2 w-2 rounded-full mr-2 ${
+                        backendStatus === 'connected' ? 'bg-green-400' :
+                        backendStatus === 'disconnected' ? 'bg-red-400' :
+                        'bg-yellow-400'
+                      }`}></div>
+                      <span className="text-sm text-gray-900">
+                        {backendStatus === 'connected' ? 'Conectado' :
+                         backendStatus === 'disconnected' ? 'Desconectado' :
+                         'Verificando...'}
+                      </span>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleRefreshStatus}
+                      disabled={backendStatus === 'checking'}
+                    >
+                      Verificar
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -78,16 +129,27 @@ export default function SettingsPage() {
             <div className="p-6">
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-700">Email por defecto</label>
-                  <p className="text-sm text-gray-900">admin@tradeoptix.com</p>
+                  <label className="text-sm font-medium text-gray-700">Email del Administrador</label>
+                  <p className="text-sm text-gray-900 font-mono bg-gray-50 px-2 py-1 rounded">admin@tradeoptix.app</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-700">Contraseña por defecto</label>
-                  <p className="text-sm text-gray-900">admin123</p>
+                  <label className="text-sm font-medium text-gray-700">Rol</label>
+                  <p className="text-sm text-gray-900">Administrador del Sistema</p>
                 </div>
-                <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4">
-                  <p className="text-sm text-yellow-800">
-                    <strong>Importante:</strong> Cambie las credenciales por defecto en producción.
+                <div>
+                  <label className="text-sm font-medium text-gray-700">Permisos</label>
+                  <div className="text-sm text-gray-900">
+                    <ul className="list-disc list-inside space-y-1">
+                      <li>Gestión de usuarios</li>
+                      <li>Validación KYC</li>
+                      <li>Visualización de estadísticas</li>
+                      <li>Configuración del sistema</li>
+                    </ul>
+                  </div>
+                </div>
+                <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
+                  <p className="text-sm text-blue-800">
+                    <strong>Información:</strong> Use las credenciales correctas configuradas en la base de datos.
                   </p>
                 </div>
               </div>
@@ -102,7 +164,7 @@ export default function SettingsPage() {
             <div className="p-6">
               <div className="space-y-3">
                 <a
-                  href="http://localhost:8080/docs/index.html"
+                  href={`${apiUrl}/docs/index.html`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="block p-3 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors"
@@ -111,7 +173,7 @@ export default function SettingsPage() {
                   <div className="text-sm text-blue-600">Swagger UI del backend</div>
                 </a>
                 <a
-                  href="http://localhost:8080/health"
+                  href={`${apiUrl}/health`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="block p-3 bg-green-50 hover:bg-green-100 rounded-md transition-colors"
