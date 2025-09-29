@@ -1,0 +1,341 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import { DashboardLayout } from '@/components/layout/DashboardLayout'
+import { Card } from '@/components/ui/Card'
+import { Badge } from '@/components/ui/Badge'
+import { Button } from '@/components/ui/Button'
+import { 
+  PlusIcon,
+  BellIcon,
+  CheckCircleIcon,
+  ExclamationTriangleIcon,
+  InformationCircleIcon,
+  XCircleIcon,
+  SpeakerWaveIcon
+} from '@heroicons/react/24/outline'
+import toast from 'react-hot-toast'
+
+interface Notification {
+  id: string
+  user_id?: string
+  title: string
+  message: string
+  type: 'info' | 'warning' | 'success' | 'error'
+  category: 'general' | 'kyc' | 'market' | 'system'
+  data?: string
+  is_read: boolean
+  is_push_sent: boolean
+  push_sent_at?: string
+  created_at: string
+  expires_at?: string
+}
+
+interface NotificationStats {
+  total_notifications: number
+  unread_notifications: number
+  today_notifications: number
+  push_notifications_sent: number
+}
+
+export default function NotificationsPage() {
+  const [notifications, setNotifications] = useState<Notification[]>([])
+  const [stats, setStats] = useState<NotificationStats | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [showCreateModal, setShowCreateModal] = useState(false)
+  const [isProcessing, setIsProcessing] = useState(false)
+
+  useEffect(() => {
+    loadNotifications()
+    loadStats()
+  }, [])
+
+  const loadNotifications = async () => {
+    try {
+      setIsLoading(true)
+      // TODO: Implementar llamada a la API
+      const mockNotifications: Notification[] = [
+        {
+          id: '1',
+          title: 'Bienvenido a TradeOptix',
+          message: 'Tu cuenta ha sido creada exitosamente. Completa tu verificación KYC para comenzar.',
+          type: 'info',
+          category: 'general',
+          is_read: false,
+          is_push_sent: true,
+          created_at: new Date().toISOString(),
+        },
+        {
+          id: '2',
+          title: 'Documento KYC Aprobado',
+          message: 'Tu documento de identidad ha sido aprobado correctamente.',
+          type: 'success',
+          category: 'kyc',
+          is_read: true,
+          is_push_sent: true,
+          push_sent_at: new Date().toISOString(),
+          created_at: new Date(Date.now() - 86400000).toISOString(),
+        }
+      ]
+      setNotifications(mockNotifications)
+    } catch (error) {
+      console.error('Error loading notifications:', error)
+      toast.error('Error cargando notificaciones')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const loadStats = async () => {
+    try {
+      // TODO: Implementar llamada a la API
+      const mockStats: NotificationStats = {
+        total_notifications: 150,
+        unread_notifications: 23,
+        today_notifications: 12,
+        push_notifications_sent: 98
+      }
+      setStats(mockStats)
+    } catch (error) {
+      console.error('Error loading stats:', error)
+    }
+  }
+
+  const getTypeIcon = (type: string) => {
+    switch (type) {
+      case 'success':
+        return <CheckCircleIcon className="h-5 w-5 text-green-500" />
+      case 'warning':
+        return <ExclamationTriangleIcon className="h-5 w-5 text-yellow-500" />
+      case 'error':
+        return <XCircleIcon className="h-5 w-5 text-red-500" />
+      default:
+        return <InformationCircleIcon className="h-5 w-5 text-blue-500" />
+    }
+  }
+
+  const getTypeBadgeVariant = (type: string) => {
+    switch (type) {
+      case 'success': return 'success'
+      case 'warning': return 'warning'
+      case 'error': return 'error'
+      default: return 'info'
+    }
+  }
+
+  const getCategoryText = (category: string) => {
+    switch (category) {
+      case 'kyc': return 'KYC'
+      case 'market': return 'Mercado'
+      case 'system': return 'Sistema'
+      default: return 'General'
+    }
+  }
+
+  const getCategoryBadgeVariant = (category: string) => {
+    switch (category) {
+      case 'kyc': return 'warning'
+      case 'market': return 'success'
+      case 'system': return 'error'
+      default: return 'default'
+    }
+  }
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('es-ES', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  }
+
+  return (
+    <DashboardLayout>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-semibold text-gray-900">Notificaciones</h1>
+            <p className="text-sm text-gray-600">
+              Gestión de notificaciones push y comunicación con usuarios
+            </p>
+          </div>
+          <Button
+            onClick={() => setShowCreateModal(true)}
+            className="flex items-center gap-2"
+          >
+            <SpeakerWaveIcon className="h-4 w-4" />
+            Enviar Notificación
+          </Button>
+        </div>
+
+        {/* Estadísticas */}
+        {stats && (
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-4">
+            <Card>
+              <div className="p-6">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <BellIcon className="h-8 w-8 text-blue-600" />
+                  </div>
+                  <div className="ml-5">
+                    <p className="text-sm font-medium text-gray-500">Total</p>
+                    <p className="text-2xl font-semibold text-gray-900">{stats.total_notifications}</p>
+                  </div>
+                </div>
+              </div>
+            </Card>
+
+            <Card>
+              <div className="p-6">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <ExclamationTriangleIcon className="h-8 w-8 text-yellow-600" />
+                  </div>
+                  <div className="ml-5">
+                    <p className="text-sm font-medium text-gray-500">Sin Leer</p>
+                    <p className="text-2xl font-semibold text-gray-900">{stats.unread_notifications}</p>
+                  </div>
+                </div>
+              </div>
+            </Card>
+
+            <Card>
+              <div className="p-6">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <CheckCircleIcon className="h-8 w-8 text-green-600" />
+                  </div>
+                  <div className="ml-5">
+                    <p className="text-sm font-medium text-gray-500">Hoy</p>
+                    <p className="text-2xl font-semibold text-gray-900">{stats.today_notifications}</p>
+                  </div>
+                </div>
+              </div>
+            </Card>
+
+            <Card>
+              <div className="p-6">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <SpeakerWaveIcon className="h-8 w-8 text-purple-600" />
+                  </div>
+                  <div className="ml-5">
+                    <p className="text-sm font-medium text-gray-500">Push Enviadas</p>
+                    <p className="text-2xl font-semibold text-gray-900">{stats.push_notifications_sent}</p>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          </div>
+        )}
+
+        {/* Tabla de notificaciones */}
+        <Card padding="none">
+          {isLoading ? (
+            <div className="p-12 text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto"></div>
+              <p className="mt-2 text-sm text-gray-600">Cargando notificaciones...</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Notificación
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Tipo
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Categoría
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Estado
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Push
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Fecha
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {notifications.map((notification) => (
+                    <tr key={notification.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4">
+                        <div className="flex items-start">
+                          {getTypeIcon(notification.type)}
+                          <div className="ml-4">
+                            <div className="text-sm font-medium text-gray-900">
+                              {notification.title}
+                            </div>
+                            <div className="text-sm text-gray-500 line-clamp-2">
+                              {notification.message}
+                            </div>
+                            {notification.user_id && (
+                              <div className="text-xs text-gray-400 mt-1">
+                                Usuario: {notification.user_id}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <Badge variant={getTypeBadgeVariant(notification.type)}>
+                          {notification.type.charAt(0).toUpperCase() + notification.type.slice(1)}
+                        </Badge>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <Badge variant={getCategoryBadgeVariant(notification.category)}>
+                          {getCategoryText(notification.category)}
+                        </Badge>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <Badge variant={notification.is_read ? 'success' : 'warning'}>
+                          {notification.is_read ? 'Leída' : 'Sin leer'}
+                        </Badge>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <Badge variant={notification.is_push_sent ? 'success' : 'default'}>
+                          {notification.is_push_sent ? 'Enviada' : 'No enviada'}
+                        </Badge>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {formatDate(notification.created_at)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              {notifications.length === 0 && !isLoading && (
+                <div className="text-center py-12">
+                  <BellIcon className="mx-auto h-12 w-12 text-gray-400" />
+                  <h3 className="mt-2 text-sm font-medium text-gray-900">
+                    No hay notificaciones
+                  </h3>
+                  <p className="mt-1 text-sm text-gray-500">
+                    Las notificaciones enviadas aparecerán aquí.
+                  </p>
+                  <div className="mt-6">
+                    <Button onClick={() => setShowCreateModal(true)}>
+                      <SpeakerWaveIcon className="h-4 w-4 mr-2" />
+                      Enviar Notificación
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </Card>
+
+        {/* TODO: Agregar modal de crear notificación */}
+      </div>
+    </DashboardLayout>
+  )
+}

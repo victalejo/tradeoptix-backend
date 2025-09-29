@@ -4,6 +4,8 @@ import {
   LoginResponse, 
   RegisterRequest, 
   KYCDocument, 
+  MarketNews,
+  Notification,
   ApiResponse 
 } from '../types';
 
@@ -162,6 +164,91 @@ class ApiService {
     }
 
     return response.blob();
+  }
+
+  // News methods
+  async getLatestNews(token: string, limit: number = 5): Promise<MarketNews[]> {
+    const response = await this.request<MarketNews[]>(`/news/latest?limit=${limit}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data || [];
+  }
+
+  async getNewsById(token: string, newsId: string): Promise<MarketNews> {
+    const response = await this.request<MarketNews>(`/news/${newsId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.data) {
+      throw new Error('Noticia no encontrada');
+    }
+    return response.data;
+  }
+
+  // Notification methods
+  async getUserNotifications(
+    token: string, 
+    page: number = 1, 
+    limit: number = 20,
+    unreadOnly: boolean = false
+  ): Promise<{ data: Notification[]; total: number; page: number; total_pages: number }> {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+      unread_only: unreadOnly.toString(),
+    });
+    
+    const response = await this.request<{
+      data: Notification[];
+      total: number;
+      page: number;
+      total_pages: number;
+    }>(`/notifications?${params.toString()}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    
+    return response.data || { data: [], total: 0, page: 1, total_pages: 0 };
+  }
+
+  async getUnreadNotificationCount(token: string): Promise<number> {
+    const response = await this.request<{ unread_count: number }>('/notifications/unread-count', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data?.unread_count || 0;
+  }
+
+  async markNotificationAsRead(token: string, notificationId: string): Promise<void> {
+    await this.request(`/notifications/${notificationId}/read`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  }
+
+  async markAllNotificationsAsRead(token: string): Promise<void> {
+    await this.request('/notifications/mark-all-read', {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  }
+
+  async deleteNotification(token: string, notificationId: string): Promise<void> {
+    await this.request(`/notifications/${notificationId}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
   }
 
   // Health check

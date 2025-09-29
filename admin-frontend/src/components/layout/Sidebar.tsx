@@ -5,7 +5,9 @@ import {
   UsersIcon, 
   DocumentCheckIcon, 
   Cog6ToothIcon,
-  ArrowRightOnRectangleIcon
+  ArrowRightOnRectangleIcon,
+  NewspaperIcon,
+  BellIcon
 } from '@heroicons/react/24/outline'
 import { cn } from '@/lib/utils'
 
@@ -13,6 +15,8 @@ const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
   { name: 'Usuarios', href: '/users', icon: UsersIcon },
   { name: 'KYC', href: '/kyc', icon: DocumentCheckIcon },
+  { name: 'Noticias', href: '/news', icon: NewspaperIcon },
+  { name: 'Notificaciones', href: '/notifications', icon: BellIcon },
   { name: 'Configuración', href: '/settings', icon: Cog6ToothIcon },
 ]
 

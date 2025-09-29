@@ -7,23 +7,71 @@ import {
   RefreshControl,
   TouchableOpacity,
   Alert,
+  FlatList,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
+import { MarketNews, Notification } from '../types';
 import ApiService from '../services/api';
 
 export const HomeScreen: React.FC = () => {
   const { user, token } = useAuth();
   const navigation = useNavigation();
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [news, setNews] = useState<MarketNews[]>([]);
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
+  const [isLoadingNews, setIsLoadingNews] = useState(false);
+
+  useEffect(() => {
+    loadInitialData();
+  }, [token]);
+
+  const loadInitialData = async () => {
+    if (!token) return;
+    
+    try {
+      await Promise.all([
+        loadLatestNews(),
+        loadUnreadNotificationCount(),
+      ]);
+    } catch (error) {
+      console.error('Error loading initial data:', error);
+    }
+  };
+
+  const loadLatestNews = async () => {
+    if (!token) return;
+    
+    try {
+      setIsLoadingNews(true);
+      const latestNews = await ApiService.getLatestNews(token, 5);
+      setNews(latestNews);
+    } catch (error) {
+      console.error('Error loading news:', error);
+      Alert.alert('Error', 'No se pudieron cargar las noticias');
+    } finally {
+      setIsLoadingNews(false);
+    }
+  };
+
+  const loadUnreadNotificationCount = async () => {
+    if (!token) return;
+    
+    try {
+      const count = await ApiService.getUnreadNotificationCount(token);
+      setUnreadNotifications(count);
+    } catch (error) {
+      console.error('Error loading notification count:', error);
+    }
+  };
 
   const onRefresh = async () => {
     setIsRefreshing(true);
-    // Aquí podrías actualizar datos del usuario
-    setTimeout(() => setIsRefreshing(false), 2000);
+    await loadInitialData();
+    setIsRefreshing(false);
   };
 
   const getKYCStatusColor = () => {
@@ -60,6 +108,36 @@ export const HomeScreen: React.FC = () => {
     navigation.navigate('KYC');
   };
 
+  const getNewsIcon = (category: string) => {
+    switch (category) {
+      case 'markets':
+        return 'trending-up';
+      case 'crypto':
+        return 'logo-bitcoin';
+      case 'analysis':
+        return 'analytics';
+      case 'regulation':
+        return 'document-text';
+      default:
+        return 'newspaper';
+    }
+  };
+
+  const getNewsCategoryColor = (category: string) => {
+    switch (category) {
+      case 'markets':
+        return '#34C759';
+      case 'crypto':
+        return '#FF9500';
+      case 'analysis':
+        return '#007AFF';
+      case 'regulation':
+        return '#FF3B30';
+      default:
+        return '#8E8E93';
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
@@ -76,14 +154,34 @@ export const HomeScreen: React.FC = () => {
         >
           <View style={styles.headerContent}>
             <View>
-              <Text style={styles.greeting}>{getGreeting()},</Text>
+              <Text style={styles.greeting}>{getGreeting()}</Text>
               <Text style={styles.userName}>
                 {user?.first_name} {user?.last_name}
               </Text>
             </View>
-            <TouchableOpacity style={styles.profileIcon}>
-              <Ionicons name="person-circle" size={40} color="#FFFFFF" />
-            </TouchableOpacity>
+            <View style={styles.headerActions}>
+              {/* Campana de notificaciones */}
+              <TouchableOpacity 
+                style={styles.notificationIcon}
+                onPress={() => {
+                  // TODO: Navegar a pantalla de notificaciones
+                  Alert.alert('Notificaciones', `Tienes ${unreadNotifications} notificaciones sin leer`);
+                }}
+              >
+                <Ionicons name="notifications" size={28} color="#FFFFFF" />
+                {unreadNotifications > 0 && (
+                  <View style={styles.notificationBadge}>
+                    <Text style={styles.notificationBadgeText}>
+                      {unreadNotifications > 99 ? '99+' : unreadNotifications.toString()}
+                    </Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+              
+              <TouchableOpacity style={styles.profileIcon}>
+                <Ionicons name="person-circle" size={40} color="#FFFFFF" />
+              </TouchableOpacity>
+            </View>
           </View>
         </LinearGradient>
 
@@ -205,20 +303,66 @@ export const HomeScreen: React.FC = () => {
           </View>
         </View>
 
-        {/* Noticias/Tips */}
+        {/* Noticias del Mercado */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Noticias del Mercado</Text>
-          <View style={styles.newsCard}>
-            <Ionicons name="newspaper" size={24} color="#007AFF" />
-            <View style={styles.newsContent}>
-              <Text style={styles.newsTitle}>
-                Mercados en Alza
-              </Text>
-              <Text style={styles.newsDescription}>
-                Los índices principales muestran tendencia positiva...
-              </Text>
+          {isLoadingNews ? (
+            <View style={styles.newsCard}>
+              <Ionicons name="newspaper" size={24} color="#007AFF" />
+              <View style={styles.newsContent}>
+                <Text style={styles.newsTitle}>Cargando...</Text>
+                <Text style={styles.newsDescription}>Obteniendo las últimas noticias...</Text>
+              </View>
             </View>
-          </View>
+          ) : news.length > 0 ? (
+            <FlatList
+              data={news}
+              keyExtractor={(item) => item.id}
+              showsVerticalScrollIndicator={false}
+              renderItem={({ item }) => (
+                <TouchableOpacity 
+                  style={styles.newsCard}
+                  onPress={() => {
+                    // TODO: Navegar a pantalla de detalle de noticia
+                    Alert.alert(item.title, item.summary || item.content.substring(0, 150) + '...');
+                  }}
+                >
+                  <Ionicons 
+                    name={getNewsIcon(item.category)} 
+                    size={24} 
+                    color={getNewsCategoryColor(item.category)} 
+                  />
+                  <View style={styles.newsContent}>
+                    <Text style={styles.newsTitle} numberOfLines={2}>
+                      {item.title}
+                    </Text>
+                    <Text style={styles.newsDescription} numberOfLines={2}>
+                      {item.summary || item.content}
+                    </Text>
+                    <Text style={styles.newsDate}>
+                      {new Date(item.published_at).toLocaleDateString('es-ES')}
+                    </Text>
+                  </View>
+                  {item.priority > 2 && (
+                    <View style={styles.priorityBadge}>
+                      <Ionicons name="alert-circle" size={16} color="#FF3B30" />
+                    </View>
+                  )}
+                </TouchableOpacity>
+              )}
+              ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
+            />
+          ) : (
+            <View style={styles.newsCard}>
+              <Ionicons name="newspaper-outline" size={24} color="#8E8E93" />
+              <View style={styles.newsContent}>
+                <Text style={styles.newsTitle}>Sin noticias disponibles</Text>
+                <Text style={styles.newsDescription}>
+                  No hay noticias del mercado en este momento
+                </Text>
+              </View>
+            </View>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -415,5 +559,47 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#8E8E93',
     lineHeight: 20,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  notificationIcon: {
+    position: 'relative',
+    padding: 4,
+  },
+  notificationBadge: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    backgroundColor: '#FF3B30',
+    borderRadius: 10,
+    minWidth: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+  },
+  notificationBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  newsDate: {
+    fontSize: 12,
+    color: '#8E8E93',
+    marginTop: 4,
+    fontStyle: 'italic',
+  },
+  priorityBadge: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    backgroundColor: 'rgba(255, 59, 48, 0.1)',
+    borderRadius: 12,
+    padding: 4,
   },
 });

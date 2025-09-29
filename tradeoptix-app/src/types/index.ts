@@ -58,6 +58,36 @@ export interface KYCDocument {
   updated_at: string;
 }
 
+export interface MarketNews {
+  id: string;
+  title: string;
+  content: string;
+  summary?: string;
+  image_url?: string;
+  category: 'general' | 'markets' | 'crypto' | 'analysis' | 'regulation';
+  priority: number;
+  is_active: boolean;
+  published_at: string;
+  created_by?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Notification {
+  id: string;
+  user_id?: string;
+  title: string;
+  message: string;
+  type: 'info' | 'warning' | 'success' | 'error';
+  category: 'general' | 'kyc' | 'market' | 'system';
+  data?: string;
+  is_read: boolean;
+  is_push_sent: boolean;
+  push_sent_at?: string;
+  created_at: string;
+  expires_at?: string;
+}
+
 export interface ApiResponse<T = any> {
   message?: string;
   data?: T;
