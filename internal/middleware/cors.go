@@ -26,15 +26,15 @@ func DefaultCORSConfig() *CORSConfig {
 	}
 
 	origins := strings.Split(allowedOrigins, ",")
-	
+
 	return &CORSConfig{
 		AllowOrigins: origins,
 		AllowMethods: []string{
 			"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS",
 		},
 		AllowHeaders: []string{
-			"Content-Type", "Content-Length", "Accept-Encoding", 
-			"X-CSRF-Token", "Authorization", "accept", "origin", 
+			"Content-Type", "Content-Length", "Accept-Encoding",
+			"X-CSRF-Token", "Authorization", "accept", "origin",
 			"Cache-Control", "X-Requested-With",
 		},
 		AllowCredentials: true,
@@ -49,7 +49,7 @@ func NewCORS(config *CORSConfig) gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 		origin := c.Request.Header.Get("Origin")
-		
+
 		// Verificar si el origen está permitido
 		allowed := false
 		for _, allowedOrigin := range config.AllowOrigins {
@@ -58,26 +58,26 @@ func NewCORS(config *CORSConfig) gin.HandlerFunc {
 				break
 			}
 		}
-		
+
 		// En desarrollo, permitir localhost dinámicamente
 		if strings.HasPrefix(origin, "http://localhost:") || strings.HasPrefix(origin, "https://localhost:") {
 			allowed = true
 		}
-		
+
 		// Establecer headers CORS
 		if allowed {
 			c.Header("Access-Control-Allow-Origin", origin)
 		} else if len(config.AllowOrigins) > 0 && config.AllowOrigins[0] == "*" {
 			c.Header("Access-Control-Allow-Origin", "*")
 		}
-		
+
 		if config.AllowCredentials {
 			c.Header("Access-Control-Allow-Credentials", "true")
 		}
-		
+
 		c.Header("Access-Control-Allow-Methods", strings.Join(config.AllowMethods, ", "))
 		c.Header("Access-Control-Allow-Headers", strings.Join(config.AllowHeaders, ", "))
-		
+
 		// Manejar preflight requests
 		if c.Request.Method == "OPTIONS" {
 			c.Header("Access-Control-Max-Age", "86400") // 24 horas

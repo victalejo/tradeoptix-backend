@@ -77,17 +77,17 @@ func AdminAuth() gin.HandlerFunc {
 func CORS() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		origin := c.Request.Header.Get("Origin")
-		
+
 		// Lista de orígenes permitidos
 		allowedOrigins := []string{
 			"http://localhost:3000",
-			"http://localhost:3004", 
+			"http://localhost:3004",
 			"http://localhost:8082",
 			"https://admin.tradeoptix.app",
 			"https://app.tradeoptix.app",
 			"https://tradeoptix.app",
 		}
-		
+
 		// Verificar si el origen está permitido
 		allowed := false
 		for _, allowedOrigin := range allowedOrigins {
@@ -96,12 +96,12 @@ func CORS() gin.HandlerFunc {
 				break
 			}
 		}
-		
+
 		// En desarrollo, permitir localhost dinámicamente
 		if strings.HasPrefix(origin, "http://localhost:") || strings.HasPrefix(origin, "https://localhost:") {
 			allowed = true
 		}
-		
+
 		// Si está permitido, establecer el header CORS específico
 		if allowed {
 			c.Header("Access-Control-Allow-Origin", origin)
@@ -109,7 +109,7 @@ func CORS() gin.HandlerFunc {
 			// Para orígenes no reconocidos, usar * (menos seguro pero funcional)
 			c.Header("Access-Control-Allow-Origin", "*")
 		}
-		
+
 		c.Header("Access-Control-Allow-Credentials", "true")
 		c.Header("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
 		c.Header("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT, DELETE, PATCH")
