@@ -56,6 +56,13 @@ func NewCORS(config *CORSConfig) gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 		origin := c.Request.Header.Get("Origin")
+		method := c.Request.Method
+
+		// Logging de debugging mejorado
+		if origin != "" {
+			println("CORS Request: Method =", method, ", Origin =", origin)
+			println("CORS Allowed Origins:", strings.Join(config.AllowOrigins, ", "))
+		}
 
 		// Verificar si el origen está permitido
 		allowed := false
@@ -70,16 +77,21 @@ func NewCORS(config *CORSConfig) gin.HandlerFunc {
 		// En desarrollo, permitir localhost dinámicamente
 		if !allowed && (strings.HasPrefix(origin, "http://localhost:") || strings.HasPrefix(origin, "https://localhost:")) {
 			allowed = true
+			println("CORS: Permitiendo localhost dinámicamente:", origin)
 		}
 
 		// Logging para debugging
-		if origin != "" && !allowed {
-			println("CORS: Origen no permitido:", origin)
-			println("CORS: Orígenes permitidos:", strings.Join(config.AllowOrigins, ", "))
+		if origin != "" {
+			if allowed {
+				println("CORS: ✅ Origen permitido:", origin)
+			} else {
+				println("CORS: ❌ Origen NO permitido:", origin)
+				println("CORS: Orígenes válidos:", strings.Join(config.AllowOrigins, ", "))
+			}
 		}
 
-		// Establecer headers CORS
-		if allowed {
+		// Establecer headers CORS SIEMPRE para todos los métodos
+		if allowed && origin != "" {
 			c.Header("Access-Control-Allow-Origin", origin)
 		} else if len(config.AllowOrigins) > 0 && config.AllowOrigins[0] == "*" {
 			c.Header("Access-Control-Allow-Origin", "*")
@@ -92,9 +104,10 @@ func NewCORS(config *CORSConfig) gin.HandlerFunc {
 		c.Header("Access-Control-Allow-Methods", strings.Join(config.AllowMethods, ", "))
 		c.Header("Access-Control-Allow-Headers", strings.Join(config.AllowHeaders, ", "))
 
-		// Manejar preflight requests
+		// Manejar preflight requests (OPTIONS)
 		if c.Request.Method == "OPTIONS" {
 			c.Header("Access-Control-Max-Age", "86400") // 24 horas
+			println("CORS: Respondiendo OPTIONS con código 204")
 			c.AbortWithStatus(http.StatusNoContent)
 			return
 		}
