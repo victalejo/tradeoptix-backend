@@ -140,6 +140,41 @@ export const HomeScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Barra superior con logo TradeOptix */}
+      <View style={styles.topBar}>
+        <Text style={styles.appName}>TradeOptix</Text>
+        <View style={styles.topBarActions}>
+          {/* Botón de noticias */}
+          <TouchableOpacity 
+            style={styles.topBarButton}
+            onPress={() => {
+              // TODO: Navegar a pantalla de noticias
+              Alert.alert('Noticias', 'Pronto disponible la sección de noticias completa');
+            }}
+          >
+            <Ionicons name="newspaper" size={24} color="#1C1C1E" />
+          </TouchableOpacity>
+
+          {/* Campana de notificaciones */}
+          <TouchableOpacity 
+            style={styles.topBarButton}
+            onPress={() => {
+              // TODO: Navegar a pantalla de notificaciones
+              Alert.alert('Notificaciones', `Tienes ${unreadNotifications} notificaciones sin leer`);
+            }}
+          >
+            <Ionicons name="notifications" size={24} color="#1C1C1E" />
+            {unreadNotifications > 0 && (
+              <View style={styles.notificationBadge}>
+                <Text style={styles.notificationBadgeText}>
+                  {unreadNotifications > 99 ? '99+' : unreadNotifications.toString()}
+                </Text>
+              </View>
+            )}
+          </TouchableOpacity>
+        </View>
+      </View>
+
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -160,35 +195,6 @@ export const HomeScreen: React.FC = () => {
               </Text>
             </View>
             <View style={styles.headerActions}>
-              {/* Botón de noticias */}
-              <TouchableOpacity 
-                style={styles.headerButton}
-                onPress={() => {
-                  // TODO: Navegar a pantalla de noticias
-                  Alert.alert('Noticias', 'Pronto disponible la sección de noticias completa');
-                }}
-              >
-                <Ionicons name="newspaper" size={24} color="#FFFFFF" />
-              </TouchableOpacity>
-
-              {/* Campana de notificaciones */}
-              <TouchableOpacity 
-                style={styles.headerButton}
-                onPress={() => {
-                  // TODO: Navegar a pantalla de notificaciones
-                  Alert.alert('Notificaciones', `Tienes ${unreadNotifications} notificaciones sin leer`);
-                }}
-              >
-                <Ionicons name="notifications" size={24} color="#FFFFFF" />
-                {unreadNotifications > 0 && (
-                  <View style={styles.notificationBadge}>
-                    <Text style={styles.notificationBadgeText}>
-                      {unreadNotifications > 99 ? '99+' : unreadNotifications.toString()}
-                    </Text>
-                  </View>
-                )}
-              </TouchableOpacity>
-              
               <TouchableOpacity style={styles.profileIcon}>
                 <Ionicons name="person-circle" size={40} color="#FFFFFF" />
               </TouchableOpacity>
@@ -389,6 +395,34 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F2F2F7',
+  },
+  topBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 10,
+    paddingBottom: 15,
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E5E7',
+  },
+  appName: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#007AFF',
+    letterSpacing: -0.5,
+  },
+  topBarActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  topBarButton: {
+    padding: 8,
+    borderRadius: 8,
+    backgroundColor: '#F2F2F7',
+    position: 'relative',
   },
   scrollContent: {
     flexGrow: 1,
@@ -601,12 +635,12 @@ const styles = StyleSheet.create({
   },
   notificationBadge: {
     position: 'absolute',
-    top: 0,
-    right: 0,
+    top: 2,
+    right: 2,
     backgroundColor: '#FF3B30',
     borderRadius: 10,
-    minWidth: 20,
-    height: 20,
+    minWidth: 18,
+    height: 18,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
