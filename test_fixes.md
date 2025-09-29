@@ -1,4 +1,19 @@
-# Pruebas de los Arreglos Implementados
+# Pruebas de los Arr## Problema 2: Elementos de verificación siempre visibles en App Móvil
+**Problema**: El botón "Verificar", la sección de "Estado de Verificación" y la barra de navegación inferior aparecían siempre, incluso cuando el usuario ya estaba verificado.
+
+**Solución implementada**:
+- Condición `{user?.kyc_status !== 'approved' && (...)}` para ocultar la sección de estado KYC
+- Condición `{user?.kyc_status !== 'approved' && (...)}` para ocultar el botón de verificación
+- Ajuste dinámico del ancho de las tarjetas de acción (30% cuando son 3 elementos, 22% cuando son 4)
+- **NUEVA**: Cambio de Tab Navigator a Stack Navigator para usuarios verificados (oculta completamente la barra inferior)
+
+**Cómo probar**:
+1. En la app móvil, cambiar el estado KYC de un usuario a 'approved' en la base de datos
+2. Verificar que la sección "Estado de Verificación" NO aparezca
+3. Verificar que en "Acciones Rápidas" NO aparezca el botón "Verificar"
+4. Verificar que los 3 botones restantes se distribuyan proporcionalmente
+5. **NUEVA**: Verificar que la barra de navegación inferior NO aparezca
+6. Con usuario no verificado, verificar que todas las secciones y la barra inferior SÍ aparezcantados
 
 ## Problema 1: Modal de rechazo en Admin Frontend
 **Problema**: El campo de texto se salía automáticamente al escribir la razón de rechazo.
@@ -41,3 +56,4 @@
 ## Archivos modificados
 1. `/admin-frontend/src/app/kyc/page.tsx` - Arreglo del modal de rechazo
 2. `/tradeoptix-app/src/screens/HomeScreen.tsx` - Ocultación condicional de elementos KYC
+3. `/tradeoptix-app/src/navigation/AppNavigator.tsx` - Ocultación de la barra de navegación inferior para usuarios verificados

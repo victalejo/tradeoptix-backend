@@ -21,7 +21,7 @@ const AuthNavigator = () => (
   </AuthStack.Navigator>
 );
 
-// Tab Navigator para la app principal
+// Tab Navigator para la app principal (usuarios no verificados)
 const Tab = createBottomTabNavigator();
 const MainTabNavigator = () => (
   <Tab.Navigator
@@ -84,13 +84,55 @@ const MainTabNavigator = () => (
   </Tab.Navigator>
 );
 
+// Stack Navigator para usuarios verificados (sin barra inferior)
+const MainStack = createStackNavigator();
+const MainStackNavigator = () => (
+  <MainStack.Navigator
+    screenOptions={{
+      headerStyle: {
+        backgroundColor: '#007AFF',
+      },
+      headerTintColor: '#FFFFFF',
+      headerTitleStyle: {
+        fontWeight: 'bold',
+      },
+    }}
+  >
+    <MainStack.Screen 
+      name="Home" 
+      component={HomeScreen} 
+      options={{ 
+        headerTitle: 'TradeOptix'
+      }} 
+    />
+    <MainStack.Screen 
+      name="KYC" 
+      component={KYCScreen} 
+      options={{ 
+        headerTitle: 'Verificación de Identidad'
+      }} 
+    />
+  </MainStack.Navigator>
+);
+
 // Navegador principal
 export const AppNavigator: React.FC = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
+
+  if (!isAuthenticated) {
+    return (
+      <NavigationContainer>
+        <AuthNavigator />
+      </NavigationContainer>
+    );
+  }
+
+  // Si el usuario está verificado (aprovado), usar Stack Navigator sin barra inferior
+  const isVerified = user?.kyc_status === 'approved';
 
   return (
     <NavigationContainer>
-      {isAuthenticated ? <MainTabNavigator /> : <AuthNavigator />}
+      {isVerified ? <MainStackNavigator /> : <MainTabNavigator />}
     </NavigationContainer>
   );
 };
