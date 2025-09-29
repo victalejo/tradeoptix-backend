@@ -29,7 +29,7 @@ func (s *NewsService) CreateNews(req models.CreateNewsRequest, adminID uuid.UUID
 
 	var news models.MarketNews
 	err := s.DB.QueryRow(
-		query, req.Title, req.Content, req.Summary, req.ImageURL, 
+		query, req.Title, req.Content, req.Summary, req.ImageURL,
 		req.Category, req.Priority, adminID,
 	).Scan(
 		&news.ID, &news.Title, &news.Content, &news.Summary, &news.ImageURL,
@@ -47,7 +47,7 @@ func (s *NewsService) CreateNews(req models.CreateNewsRequest, adminID uuid.UUID
 // GetNews obtiene todas las noticias con paginación
 func (s *NewsService) GetNews(page, limit int, category string, activeOnly bool) ([]models.MarketNews, int, error) {
 	offset := (page - 1) * limit
-	
+
 	whereClause := "WHERE 1=1"
 	args := []interface{}{}
 	argIndex := 1

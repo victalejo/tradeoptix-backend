@@ -45,18 +45,18 @@ type UpdateNewsRequest struct {
 
 // Notification representa una notificación del sistema
 type Notification struct {
-	ID          uuid.UUID  `json:"id" db:"id"`
-	UserID      *uuid.UUID `json:"user_id" db:"user_id"`
-	Title       string     `json:"title" db:"title"`
-	Message     string     `json:"message" db:"message"`
-	Type        string     `json:"type" db:"type"`
-	Category    string     `json:"category" db:"category"`
-	Data        *string    `json:"data" db:"data"`
-	IsRead      bool       `json:"is_read" db:"is_read"`
-	IsPushSent  bool       `json:"is_push_sent" db:"is_push_sent"`
-	PushSentAt  *time.Time `json:"push_sent_at" db:"push_sent_at"`
-	CreatedAt   time.Time  `json:"created_at" db:"created_at"`
-	ExpiresAt   *time.Time `json:"expires_at" db:"expires_at"`
+	ID         uuid.UUID  `json:"id" db:"id"`
+	UserID     *uuid.UUID `json:"user_id" db:"user_id"`
+	Title      string     `json:"title" db:"title"`
+	Message    string     `json:"message" db:"message"`
+	Type       string     `json:"type" db:"type"`
+	Category   string     `json:"category" db:"category"`
+	Data       *string    `json:"data" db:"data"`
+	IsRead     bool       `json:"is_read" db:"is_read"`
+	IsPushSent bool       `json:"is_push_sent" db:"is_push_sent"`
+	PushSentAt *time.Time `json:"push_sent_at" db:"push_sent_at"`
+	CreatedAt  time.Time  `json:"created_at" db:"created_at"`
+	ExpiresAt  *time.Time `json:"expires_at" db:"expires_at"`
 }
 
 // CreateNotificationRequest representa la petición para crear una notificación
@@ -72,16 +72,16 @@ type CreateNotificationRequest struct {
 
 // NotificationStats representa estadísticas de notificaciones
 type NotificationStats struct {
-	TotalNotifications   int `json:"total_notifications"`
-	UnreadNotifications  int `json:"unread_notifications"`
-	TodayNotifications   int `json:"today_notifications"`
+	TotalNotifications    int `json:"total_notifications"`
+	UnreadNotifications   int `json:"unread_notifications"`
+	TodayNotifications    int `json:"today_notifications"`
 	PushNotificationsSent int `json:"push_notifications_sent"`
 }
 
 // NewsStats representa estadísticas de noticias
 type NewsStats struct {
-	TotalNews       int `json:"total_news"`
-	ActiveNews      int `json:"active_news"`
-	TodayNews       int `json:"today_news"`
-	NewsByCategory  map[string]int `json:"news_by_category"`
+	TotalNews      int            `json:"total_news"`
+	ActiveNews     int            `json:"active_news"`
+	TodayNews      int            `json:"today_news"`
+	NewsByCategory map[string]int `json:"news_by_category"`
 }
