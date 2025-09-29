@@ -13,7 +13,7 @@ import (
 
 func SetupRoutes(router *gin.Engine, db *sql.DB) {
 	// Middleware global
-	router.Use(middleware.CORS())
+	router.Use(middleware.NewCORS(nil)) // Usar el nuevo CORS configurable
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
 
