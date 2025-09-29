@@ -5,6 +5,8 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
+import { CreateNotificationModal } from '@/components/modals/CreateNotificationModal'
+import { notificationService } from '@/lib/api'
 import { 
   PlusIcon,
   BellIcon,
@@ -12,7 +14,8 @@ import {
   ExclamationTriangleIcon,
   InformationCircleIcon,
   XCircleIcon,
-  SpeakerWaveIcon
+  SpeakerWaveIcon,
+  TrashIcon
 } from '@heroicons/react/24/outline'
 import toast from 'react-hot-toast'
 
@@ -53,34 +56,11 @@ export default function NotificationsPage() {
   const loadNotifications = async () => {
     try {
       setIsLoading(true)
-      // TODO: Implementar llamada a la API
-      const mockNotifications: Notification[] = [
-        {
-          id: '1',
-          title: 'Bienvenido a TradeOptix',
-          message: 'Tu cuenta ha sido creada exitosamente. Completa tu verificación KYC para comenzar.',
-          type: 'info',
-          category: 'general',
-          is_read: false,
-          is_push_sent: true,
-          created_at: new Date().toISOString(),
-        },
-        {
-          id: '2',
-          title: 'Documento KYC Aprobado',
-          message: 'Tu documento de identidad ha sido aprobado correctamente.',
-          type: 'success',
-          category: 'kyc',
-          is_read: true,
-          is_push_sent: true,
-          push_sent_at: new Date().toISOString(),
-          created_at: new Date(Date.now() - 86400000).toISOString(),
-        }
-      ]
-      setNotifications(mockNotifications)
+      const response = await notificationService.getNotifications(1, 50) // Cargar más notificaciones por defecto
+      setNotifications(response.data || [])
     } catch (error) {
       console.error('Error loading notifications:', error)
-      toast.error('Error cargando notificaciones')
+      toast.error('Error al cargar las notificaciones')
     } finally {
       setIsLoading(false)
     }
@@ -88,17 +68,49 @@ export default function NotificationsPage() {
 
   const loadStats = async () => {
     try {
-      // TODO: Implementar llamada a la API
-      const mockStats: NotificationStats = {
-        total_notifications: 150,
-        unread_notifications: 23,
-        today_notifications: 12,
-        push_notifications_sent: 98
-      }
-      setStats(mockStats)
+      const stats = await notificationService.getNotificationStats()
+      setStats(stats)
     } catch (error) {
       console.error('Error loading stats:', error)
     }
+  }
+
+  const handleDeleteNotification = async (id: string) => {
+    if (!confirm('¿Estás seguro de que quieres eliminar esta notificación?')) {
+      return
+    }
+
+    try {
+      setIsProcessing(true)
+      await notificationService.deleteNotification(id)
+      toast.success('Notificación eliminada exitosamente')
+      loadNotifications()
+      loadStats()
+    } catch (error) {
+      console.error('Error deleting notification:', error)
+      toast.error('Error al eliminar la notificación')
+    } finally {
+      setIsProcessing(false)
+    }
+  }
+
+  const handleSendPush = async (id: string) => {
+    try {
+      setIsProcessing(true)
+      await notificationService.sendPushNotification(id)
+      toast.success('Notificación push enviada exitosamente')
+      loadNotifications()
+    } catch (error) {
+      console.error('Error sending push:', error)
+      toast.error('Error al enviar la notificación push')
+    } finally {
+      setIsProcessing(false)
+    }
+  }
+
+  const handleNotificationCreated = () => {
+    loadNotifications()
+    loadStats()
   }
 
   const getTypeIcon = (type: string) => {
@@ -262,6 +274,9 @@ export default function NotificationsPage() {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Fecha
                     </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Acciones
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -308,6 +323,28 @@ export default function NotificationsPage() {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {formatDate(notification.created_at)}
                       </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                        {!notification.is_push_sent && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleSendPush(notification.id)}
+                            disabled={isProcessing}
+                          >
+                            <SpeakerWaveIcon className="h-4 w-4 mr-1" />
+                            Enviar Push
+                          </Button>
+                        )}
+                        <Button
+                          variant="danger"
+                          size="sm"
+                          onClick={() => handleDeleteNotification(notification.id)}
+                          disabled={isProcessing}
+                        >
+                          <TrashIcon className="h-4 w-4 mr-1" />
+                          Eliminar
+                        </Button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -334,7 +371,12 @@ export default function NotificationsPage() {
           )}
         </Card>
 
-        {/* TODO: Agregar modal de crear notificación */}
+        {/* Modales */}
+        <CreateNotificationModal
+          isOpen={showCreateModal}
+          onClose={() => setShowCreateModal(false)}
+          onSuccess={handleNotificationCreated}
+        />
       </div>
     </DashboardLayout>
   )

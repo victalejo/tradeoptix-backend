@@ -5,6 +5,8 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
+import { CreateNewsModal } from '@/components/modals/CreateNewsModal'
+import { newsService } from '@/lib/api'
 import { 
   PlusIcon,
   PencilIcon,
@@ -55,25 +57,11 @@ export default function NewsPage() {
   const loadNews = async () => {
     try {
       setIsLoading(true)
-      // TODO: Implementar llamada a la API
-      const mockNews: MarketNews[] = [
-        {
-          id: '1',
-          title: 'Mercados en Alza',
-          content: 'Los principales índices bursátiles muestran una tendencia positiva...',
-          summary: 'Tendencia alcista en los mercados principales',
-          category: 'markets',
-          priority: 2,
-          is_active: true,
-          published_at: new Date().toISOString(),
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        }
-      ]
-      setNews(mockNews)
+      const response = await newsService.getNews(1, 50) // Cargar más noticias por defecto
+      setNews(response.data || [])
     } catch (error) {
       console.error('Error loading news:', error)
-      toast.error('Error cargando noticias')
+      toast.error('Error al cargar las noticias')
     } finally {
       setIsLoading(false)
     }
@@ -81,22 +69,35 @@ export default function NewsPage() {
 
   const loadStats = async () => {
     try {
-      // TODO: Implementar llamada a la API
-      const mockStats: NewsStats = {
-        total_news: 10,
-        active_news: 8,
-        today_news: 2,
-        news_by_category: {
-          markets: 4,
-          crypto: 3,
-          analysis: 2,
-          regulation: 1
-        }
-      }
-      setStats(mockStats)
+      const stats = await newsService.getNewsStats()
+      setStats(stats)
     } catch (error) {
       console.error('Error loading stats:', error)
     }
+  }
+
+  const handleDeleteNews = async (id: string) => {
+    if (!confirm('¿Estás seguro de que quieres eliminar esta noticia?')) {
+      return
+    }
+
+    try {
+      setIsProcessing(true)
+      await newsService.deleteNews(id)
+      toast.success('Noticia eliminada exitosamente')
+      loadNews()
+      loadStats()
+    } catch (error) {
+      console.error('Error deleting news:', error)
+      toast.error('Error al eliminar la noticia')
+    } finally {
+      setIsProcessing(false)
+    }
+  }
+
+  const handleNewsCreated = () => {
+    loadNews()
+    loadStats()
   }
 
   const getCategoryText = (category: string) => {
@@ -311,10 +312,8 @@ export default function NewsPage() {
                         <Button
                           variant="danger"
                           size="sm"
-                          onClick={() => {
-                            // TODO: Implementar eliminación
-                            toast.success('Esta funcionalidad estará disponible pronto')
-                          }}
+                          onClick={() => handleDeleteNews(newsItem.id)}
+                          disabled={isProcessing}
                         >
                           <TrashIcon className="h-4 w-4 mr-1" />
                           Eliminar
@@ -346,7 +345,12 @@ export default function NewsPage() {
           )}
         </Card>
 
-        {/* TODO: Agregar modales de crear y editar */}
+        {/* Modales */}
+        <CreateNewsModal
+          isOpen={showCreateModal}
+          onClose={() => setShowCreateModal(false)}
+          onSuccess={handleNewsCreated}
+        />
       </div>
     </DashboardLayout>
   )

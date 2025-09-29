@@ -173,6 +173,111 @@ export const dashboardService = {
   }
 }
 
+// Servicios de noticias
+export const newsService = {
+  getNews: async (page: number = 1, limit: number = 10, category?: string, activeOnly?: boolean): Promise<PaginatedResponse<any>> => {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString()
+    })
+    
+    if (category) params.append('category', category)
+    if (activeOnly !== undefined) params.append('active_only', activeOnly.toString())
+    
+    const response: AxiosResponse<PaginatedResponse<any>> = await api.get(`/admin/news?${params}`)
+    return response.data
+  },
+
+  createNews: async (newsData: {
+    title: string
+    content: string
+    summary?: string
+    category: 'general' | 'markets' | 'crypto' | 'analysis' | 'regulation'
+    priority: number
+    image_url?: string
+    is_active?: boolean
+  }): Promise<any> => {
+    const response: AxiosResponse<any> = await api.post('/admin/news', newsData)
+    return response.data
+  },
+
+  updateNews: async (id: string, newsData: {
+    title?: string
+    content?: string
+    summary?: string
+    category?: 'general' | 'markets' | 'crypto' | 'analysis' | 'regulation'
+    priority?: number
+    image_url?: string
+    is_active?: boolean
+  }): Promise<any> => {
+    const response: AxiosResponse<any> = await api.put(`/admin/news/${id}`, newsData)
+    return response.data
+  },
+
+  deleteNews: async (id: string): Promise<void> => {
+    await api.delete(`/admin/news/${id}`)
+  },
+
+  getNewsStats: async (): Promise<{
+    total_news: number
+    active_news: number
+    today_news: number
+    news_by_category: Record<string, number>
+  }> => {
+    const response = await api.get('/admin/news/stats')
+    return response.data
+  }
+}
+
+// Servicios de notificaciones
+export const notificationService = {
+  getNotifications: async (page: number = 1, limit: number = 10): Promise<PaginatedResponse<any>> => {
+    const response: AxiosResponse<PaginatedResponse<any>> = await api.get(`/admin/notifications?page=${page}&limit=${limit}`)
+    return response.data
+  },
+
+  createNotification: async (notificationData: {
+    title: string
+    message: string
+    type: 'info' | 'warning' | 'success' | 'error'
+    category: 'general' | 'kyc' | 'market' | 'system'
+    user_id?: string
+    expires_at?: string
+  }): Promise<any> => {
+    const response: AxiosResponse<any> = await api.post('/admin/notifications', notificationData)
+    return response.data
+  },
+
+  updateNotification: async (id: string, notificationData: {
+    title?: string
+    message?: string
+    type?: 'info' | 'warning' | 'success' | 'error'
+    category?: 'general' | 'kyc' | 'market' | 'system'
+    expires_at?: string
+  }): Promise<any> => {
+    const response: AxiosResponse<any> = await api.put(`/admin/notifications/${id}`, notificationData)
+    return response.data
+  },
+
+  deleteNotification: async (id: string): Promise<void> => {
+    await api.delete(`/admin/notifications/${id}`)
+  },
+
+  getNotificationStats: async (): Promise<{
+    total_notifications: number
+    unread_notifications: number
+    today_notifications: number
+    push_notifications_sent: number
+  }> => {
+    const response = await api.get('/admin/notifications/stats')
+    return response.data
+  },
+
+  sendPushNotification: async (id: string): Promise<void> => {
+    await api.post(`/admin/notifications/${id}/send-push`)
+  }
+}
+
 // Servicio de salud
 export const healthService = {
   check: async (): Promise<{ status: string; message: string }> => {
