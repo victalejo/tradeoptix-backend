@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import Image from 'next/image'
 import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
@@ -194,9 +195,11 @@ export default function KYCPage() {
             {/* Vista previa del documento */}
             <div className="border-2 border-gray-200 rounded-lg overflow-hidden">
               {previewImageUrl ? (
-                <img 
+                <Image 
                   src={previewImageUrl}
                   alt={`Documento: ${selectedDocument.original_name}`}
+                  width={800}
+                  height={600}
                   className="w-full h-auto max-h-96 object-contain bg-gray-50"
                 />
               ) : (

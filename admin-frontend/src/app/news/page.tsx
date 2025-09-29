@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { CreateNewsModal } from '@/components/modals/CreateNewsModal'
 import { newsService } from '@/lib/api'
+import { MarketNews, NewsStats } from '@/types/api'
 import { 
   PlusIcon,
   PencilIcon,
@@ -18,35 +19,15 @@ import {
 } from '@heroicons/react/24/outline'
 import toast from 'react-hot-toast'
 
-interface MarketNews {
-  id: string
-  title: string
-  content: string
-  summary?: string
-  image_url?: string
-  category: 'general' | 'markets' | 'crypto' | 'analysis' | 'regulation'
-  priority: number
-  is_active: boolean
-  published_at: string
-  created_by?: string
-  created_at: string
-  updated_at: string
-}
-
-interface NewsStats {
-  total_news: number
-  active_news: number
-  today_news: number
-  news_by_category: Record<string, number>
-}
+// Tipos importados desde @/types/api
 
 export default function NewsPage() {
   const [news, setNews] = useState<MarketNews[]>([])
   const [stats, setStats] = useState<NewsStats | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [showCreateModal, setShowCreateModal] = useState(false)
-  const [showEditModal, setShowEditModal] = useState(false)
-  const [selectedNews, setSelectedNews] = useState<MarketNews | null>(null)
+  // const [showEditModal, setShowEditModal] = useState(false)
+  // const [selectedNews, setSelectedNews] = useState<MarketNews | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
 
   useEffect(() => {
@@ -302,8 +283,8 @@ export default function NewsPage() {
                           variant="outline"
                           size="sm"
                           onClick={() => {
-                            setSelectedNews(newsItem)
-                            setShowEditModal(true)
+                            // TODO: Implementar edición
+                            toast.success('Funcionalidad de edición próximamente')
                           }}
                         >
                           <PencilIcon className="h-4 w-4 mr-1" />

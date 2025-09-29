@@ -70,6 +70,50 @@ export interface PaginatedResponse<T> {
   total_pages: number;
 }
 
+export interface MarketNews {
+  id: string;
+  title: string;
+  content: string;
+  summary?: string;
+  image_url?: string;
+  category: 'general' | 'markets' | 'crypto' | 'analysis' | 'regulation';
+  priority: number;
+  is_active: boolean;
+  published_at: string;
+  created_by?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Notification {
+  id: string;
+  user_id?: string;
+  title: string;
+  message: string;
+  type: 'info' | 'warning' | 'success' | 'error';
+  category: 'general' | 'kyc' | 'market' | 'system';
+  data?: string;
+  is_read: boolean;
+  is_push_sent: boolean;
+  push_sent_at?: string;
+  created_at: string;
+  expires_at?: string;
+}
+
+export interface NewsStats {
+  total_news: number;
+  active_news: number;
+  today_news: number;
+  news_by_category: Record<string, number>;
+}
+
+export interface NotificationStats {
+  total_notifications: number;
+  unread_notifications: number;
+  today_notifications: number;
+  push_notifications_sent: number;
+}
+
 // Tipos para formularios
 export interface LoginFormData {
   email: string;

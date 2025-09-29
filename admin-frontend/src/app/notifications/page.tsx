@@ -7,8 +7,8 @@ import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { CreateNotificationModal } from '@/components/modals/CreateNotificationModal'
 import { notificationService } from '@/lib/api'
+import { Notification, NotificationStats } from '@/types/api'
 import { 
-  PlusIcon,
   BellIcon,
   CheckCircleIcon,
   ExclamationTriangleIcon,
@@ -19,27 +19,7 @@ import {
 } from '@heroicons/react/24/outline'
 import toast from 'react-hot-toast'
 
-interface Notification {
-  id: string
-  user_id?: string
-  title: string
-  message: string
-  type: 'info' | 'warning' | 'success' | 'error'
-  category: 'general' | 'kyc' | 'market' | 'system'
-  data?: string
-  is_read: boolean
-  is_push_sent: boolean
-  push_sent_at?: string
-  created_at: string
-  expires_at?: string
-}
-
-interface NotificationStats {
-  total_notifications: number
-  unread_notifications: number
-  today_notifications: number
-  push_notifications_sent: number
-}
+// Tipos importados desde @/types/api
 
 export default function NotificationsPage() {
   const [notifications, setNotifications] = useState<Notification[]>([])

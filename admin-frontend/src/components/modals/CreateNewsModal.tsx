@@ -60,9 +60,14 @@ export const CreateNewsModal: React.FC<CreateNewsModalProps> = ({
       toast.success('Noticia creada exitosamente')
       handleClose()
       onSuccess()
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error creating news:', error)
-      toast.error(error.response?.data?.error || 'Error al crear la noticia')
+      const errorMessage = error && typeof error === 'object' && 'response' in error && 
+        error.response && typeof error.response === 'object' && 'data' in error.response &&
+        error.response.data && typeof error.response.data === 'object' && 'error' in error.response.data
+        ? (error.response.data as { error: string }).error
+        : 'Error al crear la noticia'
+      toast.error(errorMessage)
     } finally {
       setIsSubmitting(false)
     }
@@ -167,7 +172,7 @@ export const CreateNewsModal: React.FC<CreateNewsModalProps> = ({
             <select
               id="category"
               value={formData.category}
-              onChange={(e) => setFormData({ ...formData, category: e.target.value as any })}
+              onChange={(e) => setFormData({ ...formData, category: e.target.value as NewsFormData['category'] })}
               className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             >
               <option value="general">General</option>

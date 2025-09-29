@@ -59,9 +59,14 @@ export const CreateNotificationModal: React.FC<CreateNotificationModalProps> = (
       toast.success('Notificación creada exitosamente')
       handleClose()
       onSuccess()
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error creating notification:', error)
-      toast.error(error.response?.data?.error || 'Error al crear la notificación')
+      const errorMessage = error && typeof error === 'object' && 'response' in error && 
+        error.response && typeof error.response === 'object' && 'data' in error.response &&
+        error.response.data && typeof error.response.data === 'object' && 'error' in error.response.data
+        ? (error.response.data as { error: string }).error
+        : 'Error al crear la notificación'
+      toast.error(errorMessage)
     } finally {
       setIsSubmitting(false)
     }
@@ -157,7 +162,7 @@ export const CreateNotificationModal: React.FC<CreateNotificationModalProps> = (
             <select
               id="type"
               value={formData.type}
-              onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}
+              onChange={(e) => setFormData({ ...formData, type: e.target.value as NotificationFormData['type'] })}
               className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             >
               <option value="info">Información</option>
@@ -175,7 +180,7 @@ export const CreateNotificationModal: React.FC<CreateNotificationModalProps> = (
             <select
               id="category"
               value={formData.category}
-              onChange={(e) => setFormData({ ...formData, category: e.target.value as any })}
+              onChange={(e) => setFormData({ ...formData, category: e.target.value as NotificationFormData['category'] })}
               className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             >
               <option value="general">General</option>
