@@ -25,7 +25,14 @@ func DefaultCORSConfig() *CORSConfig {
 		allowedOrigins = "http://localhost:3000,http://localhost:3004,http://localhost:8082,https://admin.tradeoptix.app,https://app.tradeoptix.app,https://tradeoptix.app"
 	}
 
-	origins := strings.Split(allowedOrigins, ",")
+	// Limpiar espacios en blanco y filtrar orígenes vacíos
+	var origins []string
+	for _, origin := range strings.Split(allowedOrigins, ",") {
+		trimmed := strings.TrimSpace(origin)
+		if trimmed != "" {
+			origins = append(origins, trimmed)
+		}
+	}
 
 	return &CORSConfig{
 		AllowOrigins: origins,
@@ -53,6 +60,7 @@ func NewCORS(config *CORSConfig) gin.HandlerFunc {
 		// Verificar si el origen está permitido
 		allowed := false
 		for _, allowedOrigin := range config.AllowOrigins {
+			allowedOrigin = strings.TrimSpace(allowedOrigin)
 			if origin == allowedOrigin {
 				allowed = true
 				break
@@ -60,8 +68,14 @@ func NewCORS(config *CORSConfig) gin.HandlerFunc {
 		}
 
 		// En desarrollo, permitir localhost dinámicamente
-		if strings.HasPrefix(origin, "http://localhost:") || strings.HasPrefix(origin, "https://localhost:") {
+		if !allowed && (strings.HasPrefix(origin, "http://localhost:") || strings.HasPrefix(origin, "https://localhost:")) {
 			allowed = true
+		}
+
+		// Logging para debugging
+		if origin != "" && !allowed {
+			println("CORS: Origen no permitido:", origin)
+			println("CORS: Orígenes permitidos:", strings.Join(config.AllowOrigins, ", "))
 		}
 
 		// Establecer headers CORS
