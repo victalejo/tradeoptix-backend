@@ -160,15 +160,26 @@ export const HomeScreen: React.FC = () => {
               </Text>
             </View>
             <View style={styles.headerActions}>
+              {/* Botón de noticias */}
+              <TouchableOpacity 
+                style={styles.headerButton}
+                onPress={() => {
+                  // TODO: Navegar a pantalla de noticias
+                  Alert.alert('Noticias', 'Pronto disponible la sección de noticias completa');
+                }}
+              >
+                <Ionicons name="newspaper" size={24} color="#FFFFFF" />
+              </TouchableOpacity>
+
               {/* Campana de notificaciones */}
               <TouchableOpacity 
-                style={styles.notificationIcon}
+                style={styles.headerButton}
                 onPress={() => {
                   // TODO: Navegar a pantalla de notificaciones
                   Alert.alert('Notificaciones', `Tienes ${unreadNotifications} notificaciones sin leer`);
                 }}
               >
-                <Ionicons name="notifications" size={28} color="#FFFFFF" />
+                <Ionicons name="notifications" size={24} color="#FFFFFF" />
                 {unreadNotifications > 0 && (
                   <View style={styles.notificationBadge}>
                     <Text style={styles.notificationBadgeText}>
@@ -303,9 +314,18 @@ export const HomeScreen: React.FC = () => {
           </View>
         </View>
 
-        {/* Noticias del Mercado */}
+        {/* Noticias del Mercado - Resumen */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Noticias del Mercado</Text>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Noticias del Mercado</Text>
+            <TouchableOpacity 
+              onPress={() => Alert.alert('Noticias', 'Sección completa de noticias próximamente')}
+              style={styles.viewAllButton}
+            >
+              <Text style={styles.viewAllText}>Ver todas</Text>
+              <Ionicons name="chevron-forward" size={16} color="#007AFF" />
+            </TouchableOpacity>
+          </View>
           {isLoadingNews ? (
             <View style={styles.newsCard}>
               <Ionicons name="newspaper" size={24} color="#007AFF" />
@@ -315,43 +335,39 @@ export const HomeScreen: React.FC = () => {
               </View>
             </View>
           ) : news.length > 0 ? (
-            <FlatList
-              data={news}
-              keyExtractor={(item) => item.id}
-              showsVerticalScrollIndicator={false}
-              renderItem={({ item }) => (
-                <TouchableOpacity 
-                  style={styles.newsCard}
-                  onPress={() => {
-                    // TODO: Navegar a pantalla de detalle de noticia
-                    Alert.alert(item.title, item.summary || item.content.substring(0, 150) + '...');
-                  }}
-                >
-                  <Ionicons 
-                    name={getNewsIcon(item.category)} 
-                    size={24} 
-                    color={getNewsCategoryColor(item.category)} 
-                  />
-                  <View style={styles.newsContent}>
-                    <Text style={styles.newsTitle} numberOfLines={2}>
-                      {item.title}
-                    </Text>
-                    <Text style={styles.newsDescription} numberOfLines={2}>
-                      {item.summary || item.content}
-                    </Text>
-                    <Text style={styles.newsDate}>
-                      {new Date(item.published_at).toLocaleDateString('es-ES')}
-                    </Text>
-                  </View>
-                  {item.priority > 2 && (
-                    <View style={styles.priorityBadge}>
-                      <Ionicons name="alert-circle" size={16} color="#FF3B30" />
+            <View>
+              {news.slice(0, 3).map((item, index) => (
+                <View key={item.id}>
+                  <TouchableOpacity 
+                    style={styles.newsCard}
+                    onPress={() => Alert.alert(item.title, item.summary || item.content)}
+                  >
+                    <Ionicons 
+                      name={getNewsIcon(item.category)} 
+                      size={24} 
+                      color={getNewsCategoryColor(item.category)} 
+                    />
+                    <View style={styles.newsContent}>
+                      <Text style={styles.newsTitle} numberOfLines={2}>
+                        {item.title}
+                      </Text>
+                      <Text style={styles.newsDescription} numberOfLines={2}>
+                        {item.summary || item.content}
+                      </Text>
+                      <Text style={styles.newsDate}>
+                        {new Date(item.published_at).toLocaleDateString('es-ES')}
+                      </Text>
                     </View>
-                  )}
-                </TouchableOpacity>
-              )}
-              ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
-            />
+                    {item.priority > 2 && (
+                      <View style={styles.priorityBadge}>
+                        <Ionicons name="alert-circle" size={16} color="#FF3B30" />
+                      </View>
+                    )}
+                  </TouchableOpacity>
+                  {index < 2 && <View style={{ height: 12 }} />}
+                </View>
+              ))}
+            </View>
           ) : (
             <View style={styles.newsCard}>
               <Ionicons name="newspaper-outline" size={24} color="#8E8E93" />
@@ -560,6 +576,20 @@ const styles = StyleSheet.create({
     color: '#8E8E93',
     lineHeight: 20,
   },
+  newsDate: {
+    fontSize: 12,
+    color: '#8E8E93',
+    marginTop: 4,
+    fontStyle: 'italic',
+  },
+  priorityBadge: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    backgroundColor: 'rgba(255, 59, 48, 0.1)',
+    borderRadius: 12,
+    padding: 4,
+  },
   headerActions: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -588,18 +618,28 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
   },
-  newsDate: {
-    fontSize: 12,
-    color: '#8E8E93',
-    marginTop: 4,
-    fontStyle: 'italic',
+  headerButton: {
+    padding: 8,
+    borderRadius: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    marginHorizontal: 4,
   },
-  priorityBadge: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    backgroundColor: 'rgba(255, 59, 48, 0.1)',
-    borderRadius: 12,
-    padding: 4,
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  viewAllButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  viewAllText: {
+    fontSize: 14,
+    color: '#007AFF',
+    fontWeight: '500',
+    marginRight: 4,
   },
 });
