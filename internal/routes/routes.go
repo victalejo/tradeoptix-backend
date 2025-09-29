@@ -12,6 +12,10 @@ import (
 )
 
 func SetupRoutes(router *gin.Engine, db *sql.DB) {
+	// Deshabilitar redirects automáticos de Gin
+	router.RedirectTrailingSlash = false
+	router.RedirectFixedPath = false
+	
 	// Middleware global
 	router.Use(middleware.NewCORS(nil)) // Usar el nuevo CORS configurable
 	router.Use(gin.Logger())
@@ -97,24 +101,24 @@ func SetupRoutes(router *gin.Engine, db *sql.DB) {
 				admin.PUT("/kyc/:id/reject", adminHandler.RejectDocument)
 
 				// Noticias (CRUD completo)
-				adminNews := admin.Group("/news")
-				{
-					adminNews.POST("/", newsHandler.CreateNews)
-					adminNews.GET("/", newsHandler.GetNews)
-					adminNews.GET("/stats", newsHandler.GetNewsStats)
-					adminNews.GET("/:id", newsHandler.GetNewsByID)
-					adminNews.PUT("/:id", newsHandler.UpdateNews)
-					adminNews.DELETE("/:id", newsHandler.DeleteNews)
-				}
+				// Registrar rutas tanto con como sin trailing slash
+				admin.POST("/news", newsHandler.CreateNews)
+				admin.POST("/news/", newsHandler.CreateNews)
+				admin.GET("/news", newsHandler.GetNews)
+				admin.GET("/news/", newsHandler.GetNews)
+				admin.GET("/news/stats", newsHandler.GetNewsStats)
+				admin.GET("/news/:id", newsHandler.GetNewsByID)
+				admin.PUT("/news/:id", newsHandler.UpdateNews)
+				admin.DELETE("/news/:id", newsHandler.DeleteNews)
 
 				// Notificaciones (gestión completa)
-				adminNotifications := admin.Group("/notifications")
-				{
-					adminNotifications.POST("/", notificationHandler.CreateNotification)
-					adminNotifications.GET("/", notificationHandler.GetAllNotifications)
-					adminNotifications.GET("/stats", notificationHandler.GetNotificationStats)
-					adminNotifications.POST("/cleanup", notificationHandler.CleanupExpired)
-				}
+				// Registrar rutas tanto con como sin trailing slash
+				admin.POST("/notifications", notificationHandler.CreateNotification)
+				admin.POST("/notifications/", notificationHandler.CreateNotification)
+				admin.GET("/notifications", notificationHandler.GetAllNotifications)
+				admin.GET("/notifications/", notificationHandler.GetAllNotifications)
+				admin.GET("/notifications/stats", notificationHandler.GetNotificationStats)
+				admin.POST("/notifications/cleanup", notificationHandler.CleanupExpired)
 			}
 		}
 	}

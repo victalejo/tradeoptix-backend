@@ -90,19 +90,25 @@ func NewCORS(config *CORSConfig) gin.HandlerFunc {
 			}
 		}
 
-		// Establecer headers CORS SIEMPRE para todos los métodos
-		if allowed && origin != "" {
-			c.Header("Access-Control-Allow-Origin", origin)
-		} else if len(config.AllowOrigins) > 0 && config.AllowOrigins[0] == "*" {
-			c.Header("Access-Control-Allow-Origin", "*")
+		// Función helper para establecer headers CORS
+		setCORSHeaders := func() {
+			if allowed && origin != "" {
+				c.Header("Access-Control-Allow-Origin", origin)
+			} else if len(config.AllowOrigins) > 0 && config.AllowOrigins[0] == "*" {
+				c.Header("Access-Control-Allow-Origin", "*")
+			}
+
+			if config.AllowCredentials {
+				c.Header("Access-Control-Allow-Credentials", "true")
+			}
+
+			c.Header("Access-Control-Allow-Methods", strings.Join(config.AllowMethods, ", "))
+			c.Header("Access-Control-Allow-Headers", strings.Join(config.AllowHeaders, ", "))
+			c.Header("Vary", "Origin")
 		}
 
-		if config.AllowCredentials {
-			c.Header("Access-Control-Allow-Credentials", "true")
-		}
-
-		c.Header("Access-Control-Allow-Methods", strings.Join(config.AllowMethods, ", "))
-		c.Header("Access-Control-Allow-Headers", strings.Join(config.AllowHeaders, ", "))
+		// Establecer headers CORS inicialmente
+		setCORSHeaders()
 
 		// Manejar preflight requests (OPTIONS)
 		if c.Request.Method == "OPTIONS" {
@@ -112,6 +118,10 @@ func NewCORS(config *CORSConfig) gin.HandlerFunc {
 			return
 		}
 
+		// Procesar la petición
 		c.Next()
+		
+		// Re-establecer headers CORS después del procesamiento (importante para redirects)
+		setCORSHeaders()
 	}
 }
