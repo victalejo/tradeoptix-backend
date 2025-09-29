@@ -87,46 +87,46 @@ export const HomeScreen: React.FC = () => {
           </View>
         </LinearGradient>
 
-        {/* Estado KYC */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Estado de Verificación</Text>
-          <TouchableOpacity
-            style={[
-              styles.kycCard,
-              { borderLeftColor: getKYCStatusColor() }
-            ]}
-            onPress={navigateToKYC}
-          >
-            <View style={styles.kycContent}>
-              <View style={styles.kycInfo}>
-                <View
-                  style={[
-                    styles.kycStatus,
-                    { backgroundColor: getKYCStatusColor() + '20' }
-                  ]}
-                >
-                  <Text
+        {/* Estado KYC - Solo mostrar si no está aprobado */}
+        {user?.kyc_status !== 'approved' && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Estado de Verificación</Text>
+            <TouchableOpacity
+              style={[
+                styles.kycCard,
+                { borderLeftColor: getKYCStatusColor() }
+              ]}
+              onPress={navigateToKYC}
+            >
+              <View style={styles.kycContent}>
+                <View style={styles.kycInfo}>
+                  <View
                     style={[
-                      styles.kycStatusText,
-                      { color: getKYCStatusColor() }
+                      styles.kycStatus,
+                      { backgroundColor: getKYCStatusColor() + '20' }
                     ]}
                   >
-                    {getKYCStatusText()}
+                    <Text
+                      style={[
+                        styles.kycStatusText,
+                        { color: getKYCStatusColor() }
+                      ]}
+                    >
+                      {getKYCStatusText()}
+                    </Text>
+                  </View>
+                  <Text style={styles.kycTitle}>Verificación de Identidad</Text>
+                  <Text style={styles.kycDescription}>
+                    {user?.kyc_status === 'rejected'
+                      ? 'Tu verificación fue rechazada. Revisa los documentos'
+                      : 'Completa tu verificación para acceder a todas las funciones'}
                   </Text>
                 </View>
-                <Text style={styles.kycTitle}>Verificación de Identidad</Text>
-                <Text style={styles.kycDescription}>
-                  {user?.kyc_status === 'approved'
-                    ? 'Tu identidad ha sido verificada exitosamente'
-                    : user?.kyc_status === 'rejected'
-                    ? 'Tu verificación fue rechazada. Revisa los documentos'
-                    : 'Completa tu verificación para acceder a todas las funciones'}
-                </Text>
+                <Ionicons name="chevron-forward" size={24} color="#C7C7CC" />
               </View>
-              <Ionicons name="chevron-forward" size={24} color="#C7C7CC" />
-            </View>
-          </TouchableOpacity>
-        </View>
+            </TouchableOpacity>
+          </View>
+        )}
 
         {/* Resumen de cuenta */}
         <View style={styles.section}>
@@ -160,7 +160,7 @@ export const HomeScreen: React.FC = () => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Acciones Rápidas</Text>
           <View style={styles.actionsGrid}>
-            <TouchableOpacity style={styles.actionCard}>
+            <TouchableOpacity style={[styles.actionCard, { width: user?.kyc_status === 'approved' ? '30%' : '22%' }]}>
               <LinearGradient
                 colors={['#007AFF', '#0056CC']}
                 style={styles.actionIcon}
@@ -170,7 +170,7 @@ export const HomeScreen: React.FC = () => {
               <Text style={styles.actionText}>Invertir</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.actionCard}>
+            <TouchableOpacity style={[styles.actionCard, { width: user?.kyc_status === 'approved' ? '30%' : '22%' }]}>
               <LinearGradient
                 colors={['#FF9500', '#FF7A00']}
                 style={styles.actionIcon}
@@ -180,7 +180,7 @@ export const HomeScreen: React.FC = () => {
               <Text style={styles.actionText}>Depositar</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.actionCard}>
+            <TouchableOpacity style={[styles.actionCard, { width: user?.kyc_status === 'approved' ? '30%' : '22%' }]}>
               <LinearGradient
                 colors={['#34C759', '#28A745']}
                 style={styles.actionIcon}
@@ -190,15 +190,18 @@ export const HomeScreen: React.FC = () => {
               <Text style={styles.actionText}>Retirar</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.actionCard} onPress={navigateToKYC}>
-              <LinearGradient
-                colors={['#AF52DE', '#8E44AD']}
-                style={styles.actionIcon}
-              >
-                <Ionicons name="shield-checkmark" size={24} color="#FFFFFF" />
-              </LinearGradient>
-              <Text style={styles.actionText}>Verificar</Text>
-            </TouchableOpacity>
+            {/* Solo mostrar botón de verificación si no está aprobado */}
+            {user?.kyc_status !== 'approved' && (
+              <TouchableOpacity style={[styles.actionCard, { width: '22%' }]} onPress={navigateToKYC}>
+                <LinearGradient
+                  colors={['#AF52DE', '#8E44AD']}
+                  style={styles.actionIcon}
+                >
+                  <Ionicons name="shield-checkmark" size={24} color="#FFFFFF" />
+                </LinearGradient>
+                <Text style={styles.actionText}>Verificar</Text>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
 
@@ -368,7 +371,6 @@ const styles = StyleSheet.create({
   },
   actionCard: {
     alignItems: 'center',
-    width: '22%',
   },
   actionIcon: {
     width: 60,

@@ -271,9 +271,23 @@ export default function KYCPage() {
   const RejectModal = () => {
     if (!selectedDocument) return null
 
+    const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+      // Solo cerrar si se hace clic en el backdrop, no en el contenido del modal
+      if (e.target === e.currentTarget) {
+        setShowRejectModal(false)
+        setRejectReason('')
+      }
+    }
+
     return (
-      <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-        <div className="relative top-20 mx-auto p-5 border w-11/12 max-w-md shadow-lg rounded-md bg-white">
+      <div 
+        className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50"
+        onClick={handleBackdropClick}
+      >
+        <div 
+          className="relative top-20 mx-auto p-5 border w-11/12 max-w-md shadow-lg rounded-md bg-white"
+          onClick={(e) => e.stopPropagation()}
+        >
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold text-gray-900">
               Rechazar Documento
@@ -298,8 +312,9 @@ export default function KYCPage() {
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 resize-none"
               placeholder="Describa la razón por la cual se rechaza el documento..."
+              autoFocus
             />
           </div>
 
