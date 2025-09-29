@@ -188,7 +188,7 @@ export const newsService = {
     if (category) params.append('category', category)
     if (activeOnly !== undefined) params.append('active_only', activeOnly.toString())
     
-    const response: AxiosResponse<PaginatedResponse<MarketNews>> = await api.get(`/admin/news?${params}`)
+    const response: AxiosResponse<PaginatedResponse<MarketNews>> = await api.get(`/admin/news/?${params}`)
     return response.data
   },
 
@@ -201,7 +201,7 @@ export const newsService = {
     image_url?: string
     is_active?: boolean
   }): Promise<MarketNews> => {
-    const response: AxiosResponse<MarketNews> = await api.post('/admin/news', newsData)
+    const response: AxiosResponse<MarketNews> = await api.post('/admin/news/', newsData)
     return response.data
   },
 
@@ -231,7 +231,7 @@ export const newsService = {
 // Servicios de notificaciones
 export const notificationService = {
   getNotifications: async (page: number = 1, limit: number = 10): Promise<PaginatedResponse<Notification>> => {
-    const response: AxiosResponse<PaginatedResponse<Notification>> = await api.get(`/admin/notifications?page=${page}&limit=${limit}`)
+    const response: AxiosResponse<PaginatedResponse<Notification>> = await api.get(`/admin/notifications/?page=${page}&limit=${limit}`)
     return response.data
   },
 
@@ -243,7 +243,7 @@ export const notificationService = {
     user_id?: string
     expires_at?: string
   }): Promise<Notification> => {
-    const response: AxiosResponse<Notification> = await api.post('/admin/notifications', notificationData)
+    const response: AxiosResponse<Notification> = await api.post('/admin/notifications/', notificationData)
     return response.data
   },
 
