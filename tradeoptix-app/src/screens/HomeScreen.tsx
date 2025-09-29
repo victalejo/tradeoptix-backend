@@ -140,41 +140,6 @@ export const HomeScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Barra superior con logo TradeOptix */}
-      <View style={styles.topBar}>
-        <Text style={styles.appName}>TradeOptix</Text>
-        <View style={styles.topBarActions}>
-          {/* Botón de noticias */}
-          <TouchableOpacity 
-            style={styles.topBarButton}
-            onPress={() => {
-              // TODO: Navegar a pantalla de noticias
-              Alert.alert('Noticias', 'Pronto disponible la sección de noticias completa');
-            }}
-          >
-            <Ionicons name="newspaper" size={24} color="#1C1C1E" />
-          </TouchableOpacity>
-
-          {/* Campana de notificaciones */}
-          <TouchableOpacity 
-            style={styles.topBarButton}
-            onPress={() => {
-              // TODO: Navegar a pantalla de notificaciones
-              Alert.alert('Notificaciones', `Tienes ${unreadNotifications} notificaciones sin leer`);
-            }}
-          >
-            <Ionicons name="notifications" size={24} color="#1C1C1E" />
-            {unreadNotifications > 0 && (
-              <View style={styles.notificationBadge}>
-                <Text style={styles.notificationBadgeText}>
-                  {unreadNotifications > 99 ? '99+' : unreadNotifications.toString()}
-                </Text>
-              </View>
-            )}
-          </TouchableOpacity>
-        </View>
-      </View>
-
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -396,34 +361,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F2F2F7',
   },
-  topBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 10,
-    paddingBottom: 15,
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E5E7',
-  },
-  appName: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#007AFF',
-    letterSpacing: -0.5,
-  },
-  topBarActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  topBarButton: {
-    padding: 8,
-    borderRadius: 8,
-    backgroundColor: '#F2F2F7',
-    position: 'relative',
-  },
+
   scrollContent: {
     flexGrow: 1,
   },

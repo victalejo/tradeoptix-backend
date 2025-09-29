@@ -1,4 +1,5 @@
 import React from 'react';
+import { View, TouchableOpacity, Text, Alert } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -70,7 +71,30 @@ const MainTabNavigator = () => (
       component={HomeScreen} 
       options={{ 
         title: 'Inicio',
-        headerTitle: 'TradeOptix'
+        headerTitle: 'TradeOptix',
+        headerRight: () => (
+          <View style={{ flexDirection: 'row', marginRight: 15, gap: 10 }}>
+            <TouchableOpacity onPress={() => Alert.alert('Noticias', 'Próximamente disponible')}>
+              <Ionicons name="newspaper" size={24} color="#FFFFFF" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => Alert.alert('Notificaciones', 'Tienes 3 notificaciones sin leer')} style={{ position: 'relative' }}>
+              <Ionicons name="notifications" size={24} color="#FFFFFF" />
+              <View style={{
+                position: 'absolute',
+                top: -2,
+                right: -2,
+                backgroundColor: '#FF3B30',
+                borderRadius: 8,
+                minWidth: 16,
+                height: 16,
+                justifyContent: 'center',
+                alignItems: 'center'
+              }}>
+                <Text style={{ color: 'white', fontSize: 10, fontWeight: 'bold' }}>3</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        )
       }} 
     />
     <Tab.Screen 
@@ -102,7 +126,30 @@ const MainStackNavigator = () => (
       name="Home" 
       component={HomeScreen} 
       options={{ 
-        headerTitle: 'TradeOptix'
+        headerTitle: 'TradeOptix',
+        headerRight: () => (
+          <View style={{ flexDirection: 'row', marginRight: 15, gap: 10 }}>
+            <TouchableOpacity onPress={() => Alert.alert('Noticias', 'Próximamente disponible')}>
+              <Ionicons name="newspaper" size={24} color="#FFFFFF" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => Alert.alert('Notificaciones', 'Tienes 3 notificaciones sin leer')} style={{ position: 'relative' }}>
+              <Ionicons name="notifications" size={24} color="#FFFFFF" />
+              <View style={{
+                position: 'absolute',
+                top: -2,
+                right: -2,
+                backgroundColor: '#FF3B30',
+                borderRadius: 8,
+                minWidth: 16,
+                height: 16,
+                justifyContent: 'center',
+                alignItems: 'center'
+              }}>
+                <Text style={{ color: 'white', fontSize: 10, fontWeight: 'bold' }}>3</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        )
       }} 
     />
     <MainStack.Screen 
