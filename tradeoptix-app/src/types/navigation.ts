@@ -9,8 +9,16 @@ export type MainTabParamList = {
   KYC: undefined;
 };
 
+export type MainStackParamList = {
+  MainTabs: undefined;
+  Home: undefined;
+  KYC: undefined;
+  News: undefined;
+  Notifications: undefined;
+};
+
 declare global {
   namespace ReactNavigation {
-    interface RootParamList extends AuthStackParamList, MainTabParamList {}
+    interface RootParamList extends AuthStackParamList, MainTabParamList, MainStackParamList {}
   }
 }

@@ -11,6 +11,8 @@ import { LoginScreen } from '../screens/LoginScreen';
 import { RegisterScreen } from '../screens/RegisterScreen';
 import { HomeScreen } from '../screens/HomeScreen';
 import { KYCScreen } from '../screens/KYCScreen';
+import { NewsScreen } from '../screens/NewsScreen';
+import { NotificationsScreen } from '../screens/NotificationsScreen';
 
 // Stack Navigator para autenticación
 const AuthStack = createStackNavigator();
@@ -24,7 +26,7 @@ const AuthNavigator = () => (
 
 // Tab Navigator para la app principal (usuarios no verificados)
 const Tab = createBottomTabNavigator();
-const MainTabNavigator = () => (
+const UnverifiedTabNavigator = () => (
   <Tab.Navigator
     screenOptions={({ route }) => ({
       tabBarIcon: ({ focused, color, size }) => {
@@ -69,15 +71,15 @@ const MainTabNavigator = () => (
     <Tab.Screen 
       name="Home" 
       component={HomeScreen} 
-      options={{ 
+      options={({ navigation }) => ({ 
         title: 'Inicio',
         headerTitle: 'TradeOptix',
         headerRight: () => (
           <View style={{ flexDirection: 'row', marginRight: 15, gap: 10 }}>
-            <TouchableOpacity onPress={() => Alert.alert('Noticias', 'Próximamente disponible')}>
+            <TouchableOpacity onPress={() => navigation.navigate('News')}>
               <Ionicons name="newspaper" size={24} color="#FFFFFF" />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => Alert.alert('Notificaciones', 'Tienes 3 notificaciones sin leer')} style={{ position: 'relative' }}>
+            <TouchableOpacity onPress={() => navigation.navigate('Notifications')} style={{ position: 'relative' }}>
               <Ionicons name="notifications" size={24} color="#FFFFFF" />
               <View style={{
                 position: 'absolute',
@@ -95,7 +97,7 @@ const MainTabNavigator = () => (
             </TouchableOpacity>
           </View>
         )
-      }} 
+      })} 
     />
     <Tab.Screen 
       name="KYC" 
@@ -108,10 +110,10 @@ const MainTabNavigator = () => (
   </Tab.Navigator>
 );
 
-// Stack Navigator para usuarios verificados (sin barra inferior)
-const MainStack = createStackNavigator();
-const MainStackNavigator = () => (
-  <MainStack.Navigator
+// Stack Navigator que incluye el Tab Navigator y las pantallas adicionales
+const UnverifiedStack = createStackNavigator();
+const MainTabNavigator = () => (
+  <UnverifiedStack.Navigator
     screenOptions={{
       headerStyle: {
         backgroundColor: '#007AFF',
@@ -122,17 +124,53 @@ const MainStackNavigator = () => (
       },
     }}
   >
-    <MainStack.Screen 
+    <UnverifiedStack.Screen 
+      name="MainTabs" 
+      component={UnverifiedTabNavigator}
+      options={{ headerShown: false }}
+    />
+    <UnverifiedStack.Screen 
+      name="News" 
+      component={NewsScreen}
+      options={{ 
+        headerTitle: 'Noticias',
+      }}
+    />
+    <UnverifiedStack.Screen 
+      name="Notifications" 
+      component={NotificationsScreen}
+      options={{ 
+        headerTitle: 'Notificaciones',
+      }}
+    />
+  </UnverifiedStack.Navigator>
+);
+
+// Stack Navigator para usuarios verificados (sin barra inferior)
+const VerifiedStack = createStackNavigator();
+const MainStackNavigator = () => (
+  <VerifiedStack.Navigator
+    screenOptions={{
+      headerStyle: {
+        backgroundColor: '#007AFF',
+      },
+      headerTintColor: '#FFFFFF',
+      headerTitleStyle: {
+        fontWeight: 'bold',
+      },
+    }}
+  >
+    <VerifiedStack.Screen 
       name="Home" 
       component={HomeScreen} 
-      options={{ 
+      options={({ navigation }) => ({ 
         headerTitle: 'TradeOptix',
         headerRight: () => (
           <View style={{ flexDirection: 'row', marginRight: 15, gap: 10 }}>
-            <TouchableOpacity onPress={() => Alert.alert('Noticias', 'Próximamente disponible')}>
+            <TouchableOpacity onPress={() => navigation.navigate('News')}>
               <Ionicons name="newspaper" size={24} color="#FFFFFF" />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => Alert.alert('Notificaciones', 'Tienes 3 notificaciones sin leer')} style={{ position: 'relative' }}>
+            <TouchableOpacity onPress={() => navigation.navigate('Notifications')} style={{ position: 'relative' }}>
               <Ionicons name="notifications" size={24} color="#FFFFFF" />
               <View style={{
                 position: 'absolute',
@@ -150,16 +188,30 @@ const MainStackNavigator = () => (
             </TouchableOpacity>
           </View>
         )
-      }} 
+      })} 
     />
-    <MainStack.Screen 
+    <VerifiedStack.Screen 
       name="KYC" 
       component={KYCScreen} 
       options={{ 
         headerTitle: 'Verificación de Identidad'
       }} 
     />
-  </MainStack.Navigator>
+    <VerifiedStack.Screen 
+      name="News" 
+      component={NewsScreen}
+      options={{ 
+        headerTitle: 'Noticias',
+      }}
+    />
+    <VerifiedStack.Screen 
+      name="Notifications" 
+      component={NotificationsScreen}
+      options={{ 
+        headerTitle: 'Notificaciones',
+      }}
+    />
+  </VerifiedStack.Navigator>
 );
 
 // Navegador principal
