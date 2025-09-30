@@ -241,3 +241,38 @@ func (h *NotificationHandler) CleanupExpired(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Notificaciones expiradas limpiadas exitosamente"})
 }
+
+// SendPushNotification envía una notificación push a los dispositivos registrados (solo admins)
+func (h *NotificationHandler) SendPushNotification(c *gin.Context) {
+	notificationIDStr := c.Param("id")
+	notificationID, err := uuid.Parse(notificationIDStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID de notificación inválido"})
+		return
+	}
+
+	// Verificar que la notificación existe
+	notification, err := h.NotificationService.GetNotificationByID(notificationID)
+	if err != nil {
+		if err.Error() == "notificación no encontrada" {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Notificación no encontrada"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error obteniendo notificación", "details": err.Error()})
+		return
+	}
+
+	// Por ahora, simular el envío de push notification
+	// En el futuro aquí se integraría con Firebase Cloud Messaging o similar
+	err = h.NotificationService.SendPushNotification(notificationID, notification.Title, notification.Message)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error enviando notificación push", "details": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Notificación push enviada exitosamente",
+		"notification_id": notificationID,
+		"title": notification.Title,
+	})
+}

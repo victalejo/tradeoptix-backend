@@ -119,6 +119,7 @@ func SetupRoutes(router *gin.Engine, db *sql.DB) {
 				admin.GET("/notifications/", notificationHandler.GetAllNotifications)
 				admin.GET("/notifications/stats", notificationHandler.GetNotificationStats)
 				admin.POST("/notifications/cleanup", notificationHandler.CleanupExpired)
+				admin.POST("/notifications/:id/send-push", notificationHandler.SendPushNotification)
 			}
 		}
 	}

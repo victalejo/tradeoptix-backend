@@ -73,15 +73,17 @@ export const CreateNotificationModal: React.FC<CreateNotificationModalProps> = (
   }
 
   const handleClose = () => {
-    setFormData({
-      title: '',
-      message: '',
-      type: 'info',
-      category: 'general',
-      user_id: '',
-      expires_at: ''
-    })
-    onClose()
+    if (!isSubmitting) {
+      setFormData({
+        title: '',
+        message: '',
+        type: 'info',
+        category: 'general',
+        user_id: '',
+        expires_at: ''
+      })
+      onClose()
+    }
   }
 
   // Calcular fecha por defecto (30 días desde ahora)
