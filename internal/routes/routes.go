@@ -15,7 +15,7 @@ func SetupRoutes(router *gin.Engine, db *sql.DB) {
 	// Deshabilitar redirects automáticos de Gin
 	router.RedirectTrailingSlash = false
 	router.RedirectFixedPath = false
-	
+
 	// Middleware global
 	router.Use(middleware.NewCORS(nil)) // Usar el nuevo CORS configurable
 	router.Use(gin.Logger())

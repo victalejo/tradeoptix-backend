@@ -206,7 +206,7 @@ class ApiService {
       total: number;
       page: number;
       total_pages: number;
-    }>(`/notifications?${params.toString()}`, {
+    }>(`/notifications/?${params.toString()}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

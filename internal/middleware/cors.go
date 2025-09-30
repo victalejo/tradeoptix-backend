@@ -120,7 +120,7 @@ func NewCORS(config *CORSConfig) gin.HandlerFunc {
 
 		// Procesar la petición
 		c.Next()
-		
+
 		// Re-establecer headers CORS después del procesamiento (importante para redirects)
 		setCORSHeaders()
 	}
