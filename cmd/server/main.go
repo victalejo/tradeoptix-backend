@@ -56,10 +56,10 @@ func main() {
 	db := database.Connect(cfg.DatabaseURL)
 	defer db.Close()
 
-	// Ejecutar migraciones
-	if err := database.RunMigrations(cfg.DatabaseURL); err != nil {
-		log.Fatal("Error ejecutando migraciones:", err)
-	}
+	// Ejecutar migraciones (solo en desarrollo, comentado temporalmente)
+	// if err := database.RunMigrations(cfg.DatabaseURL); err != nil {
+	// 	log.Fatal("Error ejecutando migraciones:", err)
+	// }
 
 	// Configurar Gin
 	if cfg.Environment == "production" {
