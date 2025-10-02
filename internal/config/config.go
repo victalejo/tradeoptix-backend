@@ -21,7 +21,7 @@ func Load() *Config {
 	if env := os.Getenv("ENVIRONMENT"); env != "" {
 		envFile = ".env." + env
 	}
-	
+
 	// Cargar variables de entorno desde el archivo correspondiente
 	if err := godotenv.Load(envFile); err != nil {
 		// Si no se encuentra el archivo específico, intentar cargar .env por defecto
@@ -43,7 +43,7 @@ func Load() *Config {
 		dbUser := getEnv("DB_USER", "user")
 		dbPassword := getEnv("DB_PASSWORD", "password")
 		dbName := getEnv("DB_NAME", "tradeoptix")
-		databaseURL = fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", 
+		databaseURL = fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
 			dbUser, dbPassword, dbHost, dbPort, dbName)
 	}
 

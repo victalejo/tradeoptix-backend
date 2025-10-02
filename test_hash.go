@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -13,7 +14,7 @@ func main() {
 		return
 	}
 	fmt.Println("Hash:", string(hash))
-	
+
 	// Verificar que funciona
 	err = bcrypt.CompareHashAndPassword(hash, []byte(password))
 	if err == nil {
@@ -21,7 +22,7 @@ func main() {
 	} else {
 		fmt.Println("✗ Hash verification failed:", err)
 	}
-	
+
 	// También verificar el hash de la migración
 	oldHash := "$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi"
 	err = bcrypt.CompareHashAndPassword([]byte(oldHash), []byte(password))
