@@ -35,3 +35,16 @@ Backend en Go para aplicación de inversión con:
 3. **Administración**: Panel para gestión de usuarios y validación KYC
 4. **Autenticación**: JWT tokens
 5. **Seguridad**: Validaciones, middleware, encriptación
+
+## ⚠️ IMPORTANTE - Configuración de Base de Datos
+**NUNCA USES LOCALHOST EN LA CONFIGURACIÓN DE BASE DE DATOS**
+
+El proyecto utiliza una base de datos PostgreSQL remota en producción:
+- **Host**: 194.163.133.7
+- **Puerto**: 1138
+- **Base de datos**: tradeoptix_db
+- **Usuario**: tradeoptix_user
+- **Contraseña**: nrdys53kzx8amg50
+
+❌ NO usar: `localhost`, `127.0.0.1`, o bases de datos locales
+✅ SIEMPRE usar: La configuración remota especificada en `.env`
