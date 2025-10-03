@@ -218,7 +218,8 @@ class ApiService {
     
     console.log('📥 API Response:', response);
     
-    return response.data || { data: [], total: 0, page: 1, total_pages: 0 };
+    // El response ya tiene la estructura correcta del servidor
+    return response || { data: [], total: 0, page: 1, total_pages: 0 };
   }
 
   async getUnreadNotificationCount(token: string): Promise<number> {
