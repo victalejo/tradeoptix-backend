@@ -280,8 +280,8 @@ func (h *NotificationHandler) SendPushNotification(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Notificación push enviada exitosamente",
+		"message":         "Notificación push enviada exitosamente",
 		"notification_id": notificationID,
-		"title": notification.Title,
+		"title":           notification.Title,
 	})
 }
