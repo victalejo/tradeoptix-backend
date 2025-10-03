@@ -62,13 +62,10 @@ CREATE TRIGGER update_kyc_documents_updated_at BEFORE UPDATE ON kyc_documents
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- Insertar usuario administrador por defecto
-INSERT INTO users (
-    first_name, last_name, document_type, document_number,
-    email, phone_number, address, password_hash, role, kyc_status, email_verified
-) VALUES (
-    'Admin', 'TradeOptix', 'cedula', '00000000',
-    'admin@tradeoptix.com', '+57000000000', 'Oficina Principal',
-    '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', -- password: "admin123"
+INSERT INTO users (first_name, last_name, document_type, document_number, email, phone_number, address, password_hash, role, kyc_status, email_verified)
+VALUES (
+    'Admin', 'TradeOptix', 'cedula', 'ADM-001', 'admin@tradeoptix.com', '+58-000-0000000', 'Caracas, Venezuela',
+    '$2a$10$pl50mBe9o4alXi9T/LaJz.xmYdGkVwN.NMUiRRVAmmRPO1dpmDgH.', -- password: "admin123"
     'admin', 'approved', true
 )
 ON CONFLICT (email) DO NOTHING;
