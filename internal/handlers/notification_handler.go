@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"log"
 	"net/http"
 	"strconv"
 
@@ -61,14 +62,19 @@ func (h *NotificationHandler) CreateNotification(c *gin.Context) {
 func (h *NotificationHandler) GetUserNotifications(c *gin.Context) {
 	userID, exists := c.Get("user_id")
 	if !exists {
+		log.Printf("❌ Usuario no autenticado - user_id no encontrado en contexto")
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Usuario no autenticado"})
 		return
 	}
+
+	log.Printf("🔍 GetUserNotifications - UserID: %v", userID)
 
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "20"))
 	unreadOnlyStr := c.DefaultQuery("unread_only", "false")
 	unreadOnly := unreadOnlyStr == "true"
+
+	log.Printf("📄 Parámetros - Page: %d, Limit: %d, UnreadOnly: %v", page, limit, unreadOnly)
 
 	if page < 1 {
 		page = 1
@@ -81,9 +87,12 @@ func (h *NotificationHandler) GetUserNotifications(c *gin.Context) {
 		userID.(uuid.UUID), page, limit, unreadOnly,
 	)
 	if err != nil {
+		log.Printf("❌ Error obteniendo notificaciones: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error obteniendo notificaciones", "details": err.Error()})
 		return
 	}
+
+	log.Printf("✅ Notificaciones obtenidas - Total: %d, Devueltas: %d", total, len(notifications))
 
 	totalPages := (total + limit - 1) / limit
 

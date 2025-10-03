@@ -22,11 +22,21 @@ export const NotificationsScreen: React.FC = () => {
 
   const loadNotifications = async () => {
     try {
-      if (!token) return;
+      if (!token) {
+        console.log('❌ No hay token disponible');
+        return;
+      }
+      
+      console.log('🔍 Cargando notificaciones con token:', token?.substring(0, 20) + '...');
       const response = await api.getUserNotifications(token);
+      console.log('✅ Respuesta del servidor:', JSON.stringify(response, null, 2));
+      console.log('📊 Número de notificaciones recibidas:', response.data?.length || 0);
+      
       setNotifications(response.data || []);
-    } catch (error) {
-      console.error('Error loading notifications:', error);
+    } catch (error: any) {
+      console.error('❌ Error loading notifications:', error);
+      console.error('❌ Error details:', error.response?.data || error.message);
+      console.error('❌ Error status:', error.response?.status);
       setNotifications([]);
       Alert.alert('Error', 'No se pudieron cargar las notificaciones');
     } finally {

@@ -9,7 +9,20 @@ import {
   ApiResponse 
 } from '../types';
 
-const API_BASE_URL = 'https://api.tradeoptix.app/api/v1';
+// Configuración de la URL del API
+// Para desarrollo local en emulador Android: 'http://10.0.2.2:8080/api/v1'
+// Para desarrollo local en emulador iOS: 'http://localhost:8080/api/v1'  
+// Para dispositivo físico: 'http://TU_IP_LOCAL:8080/api/v1' (ej: http://192.168.1.100:8080/api/v1)
+// Para producción: 'https://api.tradeoptix.app/api/v1'
+
+const DEV_MODE = true; // Cambiar a false para producción
+const LOCAL_IP = '10.0.2.2'; // Para Android Emulator. Cambiar según tu configuración
+
+const API_BASE_URL = DEV_MODE 
+  ? `http://${LOCAL_IP}:8080/api/v1`  // Desarrollo
+  : 'https://api.tradeoptix.app/api/v1';  // Producción
+
+console.log('🌐 API Base URL:', API_BASE_URL);
 
 class ApiService {
   private baseURL: string;
@@ -201,16 +214,22 @@ class ApiService {
       unread_only: unreadOnly.toString(),
     });
     
+    const url = `/notifications/?${params.toString()}`;
+    console.log('🌐 API Call: GET', `${this.baseURL}${url}`);
+    console.log('🔑 Token presente:', token ? 'Sí' : 'No');
+    
     const response = await this.request<{
       data: Notification[];
       total: number;
       page: number;
       total_pages: number;
-    }>(`/notifications/?${params.toString()}`, {
+    }>(url, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
+    
+    console.log('📥 API Response:', response);
     
     return response.data || { data: [], total: 0, page: 1, total_pages: 0 };
   }
