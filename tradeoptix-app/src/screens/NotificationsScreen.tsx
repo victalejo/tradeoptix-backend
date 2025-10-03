@@ -24,9 +24,10 @@ export const NotificationsScreen: React.FC = () => {
     try {
       if (!token) return;
       const response = await api.getUserNotifications(token);
-      setNotifications(response.data);
+      setNotifications(response.data || []);
     } catch (error) {
       console.error('Error loading notifications:', error);
+      setNotifications([]);
       Alert.alert('Error', 'No se pudieron cargar las notificaciones');
     } finally {
       setLoading(false);
@@ -176,7 +177,7 @@ export const NotificationsScreen: React.FC = () => {
     );
   }
 
-  const unreadCount = notifications.filter(n => !n.is_read).length;
+  const unreadCount = notifications?.filter(n => !n.is_read).length || 0;
 
   return (
     <View style={styles.container}>
@@ -206,7 +207,7 @@ export const NotificationsScreen: React.FC = () => {
           </View>
         ) : (
           <View style={styles.notificationsList}>
-            {notifications.map(renderNotificationItem)}
+            {notifications?.map(renderNotificationItem)}
           </View>
         )}
       </ScrollView>
