@@ -1,6 +1,19 @@
 #!/bin/bash
 
-echo "🚀 GUÍA PARA DESPLEGAR A PRODUCCIÓN"
+echo "🚀 G3. CONFIGURAR VARIABLES DE ENTORNO EN PRODUCCIÓN:
+   # Crear .env en el servidor con:
+cat << 'EOF'
+PORT=8080
+ENVIRONMENT=production
+DATABASE_URL=postgresql://tradeoptix_user:nrdys53kzx8amg50@194.163.133.7:1138/tradeoptix_db?sslmode=disable
+JWT_SECRET=dJxPh6PwKyyZcVRnVkbzMY51SftP37fy
+DB_HOST=194.163.133.7
+DB_PORT=1138
+DB_USER=tradeoptix_user
+DB_PASSWORD=nrdys53kzx8amg50
+DB_NAME=tradeoptix_db
+ALLOWED_ORIGINS=https://admin.tradeoptix.app,https://app.tradeoptix.app,https://tradeoptix.app
+EOFDESPLEGAR A PRODUCCIÓN"
 echo "=================================="
 echo ""
 echo "🎯 PROBLEMA IDENTIFICADO:"
