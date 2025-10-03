@@ -9,20 +9,7 @@ import {
   ApiResponse 
 } from '../types';
 
-// Configuración de la URL del API
-// Para desarrollo local en emulador Android: 'http://10.0.2.2:8080/api/v1'
-// Para desarrollo local en emulador iOS: 'http://localhost:8080/api/v1'  
-// Para dispositivo físico: 'http://TU_IP_LOCAL:8080/api/v1' (ej: http://192.168.1.100:8080/api/v1)
-// Para producción: 'https://api.tradeoptix.app/api/v1'
-
-const DEV_MODE = true; // Cambiar a false para producción
-const LOCAL_IP = '10.0.2.2'; // Para Android Emulator. Cambiar según tu configuración
-
-const API_BASE_URL = DEV_MODE 
-  ? `http://${LOCAL_IP}:8080/api/v1`  // Desarrollo
-  : 'https://api.tradeoptix.app/api/v1';  // Producción
-
-console.log('🌐 API Base URL:', API_BASE_URL);
+const API_BASE_URL = 'https://api.tradeoptix.app/api/v1';
 
 class ApiService {
   private baseURL: string;
