@@ -160,7 +160,7 @@ export const HomeScreen: React.FC = () => {
             </View>
             <View style={styles.headerActions}>
               <TouchableOpacity style={styles.profileIcon}>
-                <Ionicons name="person-circle" size={40} color="#FFFFFF" />
+                <Ionicons name="person-circle" size={36} color="#FFFFFF" />
               </TouchableOpacity>
             </View>
           </View>
@@ -366,8 +366,8 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: 24,
-    paddingTop: 20,
-    paddingBottom: 24,
+    paddingTop: 8,
+    paddingBottom: 20,
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
   },
@@ -387,7 +387,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   profileIcon: {
-    padding: 4,
+    padding: 0,
   },
   section: {
     padding: 24,
