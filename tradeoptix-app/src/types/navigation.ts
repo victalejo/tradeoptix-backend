@@ -1,3 +1,5 @@
+import { MarketNews } from './index';
+
 export type AuthStackParamList = {
   Welcome: undefined;
   Login: undefined;
@@ -14,6 +16,7 @@ export type MainStackParamList = {
   Home: undefined;
   KYC: undefined;
   News: undefined;
+  NewsDetail: { news: MarketNews };
   Notifications: undefined;
 };
 

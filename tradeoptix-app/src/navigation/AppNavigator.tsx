@@ -12,6 +12,7 @@ import { RegisterScreen } from '../screens/RegisterScreen';
 import { HomeScreen } from '../screens/HomeScreen';
 import { KYCScreen } from '../screens/KYCScreen';
 import { NewsScreen } from '../screens/NewsScreen';
+import { NewsDetailScreen } from '../screens/NewsDetailScreen';
 import { NotificationsScreen } from '../screens/NotificationsScreen';
 import ApiService from '../services/api';
 
@@ -162,6 +163,14 @@ const MainTabNavigator = () => (
       }}
     />
     <UnverifiedStack.Screen 
+      name="NewsDetail" 
+      component={NewsDetailScreen}
+      options={{ 
+        headerTitle: 'Detalle de Noticia',
+        headerBackTitle: 'Volver',
+      }}
+    />
+    <UnverifiedStack.Screen 
       name="Notifications" 
       component={NotificationsScreen}
       options={{ 
@@ -250,6 +259,14 @@ const MainStackNavigator = () => {
       component={NewsScreen}
       options={{ 
         headerTitle: 'Noticias',
+      }}
+    />
+    <VerifiedStack.Screen 
+      name="NewsDetail" 
+      component={NewsDetailScreen}
+      options={{ 
+        headerTitle: 'Detalle de Noticia',
+        headerBackTitle: 'Volver',
       }}
     />
     <VerifiedStack.Screen 

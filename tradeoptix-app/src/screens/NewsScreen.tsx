@@ -11,11 +11,13 @@ import {
   Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { MarketNews } from '../types';
 
 export const NewsScreen: React.FC = () => {
+  const navigation = useNavigation<any>();
   const [news, setNews] = useState<MarketNews[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -41,18 +43,8 @@ export const NewsScreen: React.FC = () => {
   };
 
   const handleNewsPress = (newsItem: MarketNews) => {
-    // Mostrar el contenido completo de la noticia
-    Alert.alert(
-      newsItem.title,
-      newsItem.content,
-      [
-        {
-          text: 'Cerrar',
-          style: 'cancel'
-        }
-      ],
-      { cancelable: true }
-    );
+    // Navegar a la pantalla de detalle
+    navigation.navigate('NewsDetail', { news: newsItem });
   };
 
   useEffect(() => {
