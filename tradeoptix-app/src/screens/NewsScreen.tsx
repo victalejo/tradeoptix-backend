@@ -40,6 +40,21 @@ export const NewsScreen: React.FC = () => {
     setRefreshing(false);
   };
 
+  const handleNewsPress = (newsItem: MarketNews) => {
+    // Mostrar el contenido completo de la noticia
+    Alert.alert(
+      newsItem.title,
+      newsItem.content,
+      [
+        {
+          text: 'Cerrar',
+          style: 'cancel'
+        }
+      ],
+      { cancelable: true }
+    );
+  };
+
   useEffect(() => {
     loadNews();
   }, []);
@@ -67,7 +82,11 @@ export const NewsScreen: React.FC = () => {
   };
 
   const renderNewsItem = (item: MarketNews) => (
-    <TouchableOpacity key={item.id} style={styles.newsCard}>
+    <TouchableOpacity 
+      key={item.id} 
+      style={styles.newsCard}
+      onPress={() => handleNewsPress(item)}
+    >
       {item.image_url && (
         <Image source={{ uri: item.image_url }} style={styles.newsImage} />
       )}

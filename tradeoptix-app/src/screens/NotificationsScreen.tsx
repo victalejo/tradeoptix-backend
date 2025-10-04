@@ -75,6 +75,26 @@ export const NotificationsScreen: React.FC = () => {
     }
   };
 
+  const handleNotificationPress = async (notification: Notification) => {
+    // Marcar como leída si no lo está
+    if (!notification.is_read) {
+      await markAsRead(notification.id);
+    }
+
+    // Mostrar el contenido completo en un Alert
+    Alert.alert(
+      notification.title,
+      notification.message,
+      [
+        {
+          text: 'Cerrar',
+          style: 'cancel'
+        }
+      ],
+      { cancelable: true }
+    );
+  };
+
   useEffect(() => {
     loadNotifications();
   }, []);
@@ -127,7 +147,7 @@ export const NotificationsScreen: React.FC = () => {
         styles.notificationCard,
         !item.is_read && styles.unreadNotification
       ]}
-      onPress={() => !item.is_read && markAsRead(item.id)}
+      onPress={() => handleNotificationPress(item)}
     >
       <View style={styles.notificationHeader}>
         <View style={styles.notificationTitleRow}>
