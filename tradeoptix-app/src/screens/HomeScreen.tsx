@@ -8,14 +8,17 @@ import {
   TouchableOpacity,
   Alert,
   FlatList,
+  StatusBar,
+  Platform,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 import { MarketNews, Notification } from '../types';
 import ApiService from '../services/api';
+
+const STATUS_BAR_HEIGHT = Platform.OS === 'ios' ? 44 : StatusBar.currentHeight || 0;
 
 export const HomeScreen: React.FC = () => {
   const { user, token } = useAuth();
@@ -138,7 +141,7 @@ export const HomeScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -160,7 +163,7 @@ export const HomeScreen: React.FC = () => {
             </View>
             <View style={styles.headerActions}>
               <TouchableOpacity style={styles.profileIcon}>
-                <Ionicons name="person-circle" size={36} color="#FFFFFF" />
+                <Ionicons name="person-circle" size={32} color="#FFFFFF" />
               </TouchableOpacity>
             </View>
           </View>
@@ -351,7 +354,7 @@ export const HomeScreen: React.FC = () => {
           )}
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -362,11 +365,11 @@ const styles = StyleSheet.create({
   },
 
   scrollContent: {
-    flexGrow: 1,
+    paddingBottom: 20,
   },
   header: {
     paddingHorizontal: 24,
-    paddingTop: 8,
+    paddingTop: STATUS_BAR_HEIGHT + 12,
     paddingBottom: 20,
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
