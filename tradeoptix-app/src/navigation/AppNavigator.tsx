@@ -14,6 +14,7 @@ import { KYCScreen } from '../screens/KYCScreen';
 import { NewsScreen } from '../screens/NewsScreen';
 import { NewsDetailScreen } from '../screens/NewsDetailScreen';
 import { NotificationsScreen } from '../screens/NotificationsScreen';
+import { ProfileScreen } from '../screens/ProfileScreen';
 import ApiService from '../services/api';
 
 // Stack Navigator para autenticación
@@ -177,6 +178,13 @@ const MainTabNavigator = () => (
         headerTitle: 'Notificaciones',
       }}
     />
+    <UnverifiedStack.Screen 
+      name="Profile" 
+      component={ProfileScreen}
+      options={{ 
+        headerTitle: 'Mi Perfil',
+      }}
+    />
   </UnverifiedStack.Navigator>
 );
 
@@ -274,6 +282,13 @@ const MainStackNavigator = () => {
       component={NotificationsScreen}
       options={{ 
         headerTitle: 'Notificaciones',
+      }}
+    />
+    <VerifiedStack.Screen 
+      name="Profile" 
+      component={ProfileScreen}
+      options={{ 
+        headerTitle: 'Mi Perfil',
       }}
     />
   </VerifiedStack.Navigator>

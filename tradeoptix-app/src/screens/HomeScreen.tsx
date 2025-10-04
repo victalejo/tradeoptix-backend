@@ -162,8 +162,11 @@ export const HomeScreen: React.FC = () => {
               </Text>
             </View>
             <View style={styles.headerActions}>
-              <TouchableOpacity style={styles.profileIcon}>
-                <Ionicons name="person-circle" size={32} color="#FFFFFF" />
+              <TouchableOpacity 
+                style={styles.profileIcon}
+                onPress={() => navigation.navigate('Profile')}
+              >
+                <Ionicons name="person-circle" size={28} color="#FFFFFF" />
               </TouchableOpacity>
             </View>
           </View>
@@ -391,6 +394,7 @@ const styles = StyleSheet.create({
   },
   profileIcon: {
     padding: 0,
+    marginRight: -4,
   },
   section: {
     padding: 24,
