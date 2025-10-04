@@ -19,7 +19,7 @@ import ApiService from '../services/api';
 
 export const HomeScreen: React.FC = () => {
   const { user, token } = useAuth();
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [news, setNews] = useState<MarketNews[]>([]);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
@@ -104,7 +104,6 @@ export const HomeScreen: React.FC = () => {
   };
 
   const navigateToKYC = () => {
-    // @ts-ignore - navegación será configurada más tarde
     navigation.navigate('KYC');
   };
 
@@ -290,7 +289,7 @@ export const HomeScreen: React.FC = () => {
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Noticias del Mercado</Text>
             <TouchableOpacity 
-              onPress={() => Alert.alert('Noticias', 'Sección completa de noticias próximamente')}
+              onPress={() => navigation.navigate('News')}
               style={styles.viewAllButton}
             >
               <Text style={styles.viewAllText}>Ver todas</Text>
@@ -311,7 +310,7 @@ export const HomeScreen: React.FC = () => {
                 <View key={item.id}>
                   <TouchableOpacity 
                     style={styles.newsCard}
-                    onPress={() => Alert.alert(item.title, item.summary || item.content)}
+                    onPress={() => navigation.navigate('NewsDetail', { news: item })}
                   >
                     <Ionicons 
                       name={getNewsIcon(item.category)} 
