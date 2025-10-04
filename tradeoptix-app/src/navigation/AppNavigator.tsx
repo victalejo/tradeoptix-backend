@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, TouchableOpacity, Text, Alert } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -13,6 +13,7 @@ import { HomeScreen } from '../screens/HomeScreen';
 import { KYCScreen } from '../screens/KYCScreen';
 import { NewsScreen } from '../screens/NewsScreen';
 import { NotificationsScreen } from '../screens/NotificationsScreen';
+import ApiService from '../services/api';
 
 // Stack Navigator para autenticación
 const AuthStack = createStackNavigator();
@@ -26,7 +27,28 @@ const AuthNavigator = () => (
 
 // Tab Navigator para la app principal (usuarios no verificados)
 const Tab = createBottomTabNavigator();
-const UnverifiedTabNavigator = () => (
+const UnverifiedTabNavigator = () => {
+  const { token } = useAuth();
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    loadUnreadCount();
+    // Actualizar cada 30 segundos
+    const interval = setInterval(loadUnreadCount, 30000);
+    return () => clearInterval(interval);
+  }, [token]);
+
+  const loadUnreadCount = async () => {
+    if (!token) return;
+    try {
+      const count = await ApiService.getUnreadNotificationCount(token);
+      setUnreadCount(count);
+    } catch (error) {
+      console.error('Error loading notification count:', error);
+    }
+  };
+
+  return (
   <Tab.Navigator
     screenOptions={({ route }) => ({
       tabBarIcon: ({ focused, color, size }) => {
@@ -81,19 +103,21 @@ const UnverifiedTabNavigator = () => (
             </TouchableOpacity>
             <TouchableOpacity onPress={() => navigation.navigate('Notifications')} style={{ position: 'relative' }}>
               <Ionicons name="notifications" size={24} color="#FFFFFF" />
-              <View style={{
-                position: 'absolute',
-                top: -2,
-                right: -2,
-                backgroundColor: '#FF3B30',
-                borderRadius: 8,
-                minWidth: 16,
-                height: 16,
-                justifyContent: 'center',
-                alignItems: 'center'
-              }}>
-                <Text style={{ color: 'white', fontSize: 10, fontWeight: 'bold' }}>3</Text>
-              </View>
+              {unreadCount > 0 && (
+                <View style={{
+                  position: 'absolute',
+                  top: -2,
+                  right: -2,
+                  backgroundColor: '#FF3B30',
+                  borderRadius: 8,
+                  minWidth: 16,
+                  height: 16,
+                  justifyContent: 'center',
+                  alignItems: 'center'
+                }}>
+                  <Text style={{ color: 'white', fontSize: 10, fontWeight: 'bold' }}>{unreadCount}</Text>
+                </View>
+              )}
             </TouchableOpacity>
           </View>
         )
@@ -108,7 +132,8 @@ const UnverifiedTabNavigator = () => (
       }} 
     />
   </Tab.Navigator>
-);
+  );
+};
 
 // Stack Navigator que incluye el Tab Navigator y las pantallas adicionales
 const UnverifiedStack = createStackNavigator();
@@ -148,7 +173,28 @@ const MainTabNavigator = () => (
 
 // Stack Navigator para usuarios verificados (sin barra inferior)
 const VerifiedStack = createStackNavigator();
-const MainStackNavigator = () => (
+const MainStackNavigator = () => {
+  const { token } = useAuth();
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    loadUnreadCount();
+    // Actualizar cada 30 segundos
+    const interval = setInterval(loadUnreadCount, 30000);
+    return () => clearInterval(interval);
+  }, [token]);
+
+  const loadUnreadCount = async () => {
+    if (!token) return;
+    try {
+      const count = await ApiService.getUnreadNotificationCount(token);
+      setUnreadCount(count);
+    } catch (error) {
+      console.error('Error loading notification count:', error);
+    }
+  };
+
+  return (
   <VerifiedStack.Navigator
     screenOptions={{
       headerStyle: {
@@ -172,19 +218,21 @@ const MainStackNavigator = () => (
             </TouchableOpacity>
             <TouchableOpacity onPress={() => navigation.navigate('Notifications')} style={{ position: 'relative' }}>
               <Ionicons name="notifications" size={24} color="#FFFFFF" />
-              <View style={{
-                position: 'absolute',
-                top: -2,
-                right: -2,
-                backgroundColor: '#FF3B30',
-                borderRadius: 8,
-                minWidth: 16,
-                height: 16,
-                justifyContent: 'center',
-                alignItems: 'center'
-              }}>
-                <Text style={{ color: 'white', fontSize: 10, fontWeight: 'bold' }}>3</Text>
-              </View>
+              {unreadCount > 0 && (
+                <View style={{
+                  position: 'absolute',
+                  top: -2,
+                  right: -2,
+                  backgroundColor: '#FF3B30',
+                  borderRadius: 8,
+                  minWidth: 16,
+                  height: 16,
+                  justifyContent: 'center',
+                  alignItems: 'center'
+                }}>
+                  <Text style={{ color: 'white', fontSize: 10, fontWeight: 'bold' }}>{unreadCount}</Text>
+                </View>
+              )}
             </TouchableOpacity>
           </View>
         )
@@ -212,7 +260,8 @@ const MainStackNavigator = () => (
       }}
     />
   </VerifiedStack.Navigator>
-);
+  );
+};
 
 // Navegador principal
 export const AppNavigator: React.FC = () => {
