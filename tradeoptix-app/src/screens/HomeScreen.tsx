@@ -394,7 +394,7 @@ const styles = StyleSheet.create({
   },
   profileIcon: {
     padding: 0,
-    marginRight: -4,
+    marginRight: 8,
   },
   section: {
     padding: 24,
